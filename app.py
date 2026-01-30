@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -88,7 +88,7 @@ def get_history(student_id):
 
 @app.route('/')
 def dashboard():
-    return open('quiz.html').read()  
+    return render_template('quiz.html')  
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
