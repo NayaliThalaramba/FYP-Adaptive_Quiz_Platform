@@ -176,11 +176,14 @@
 
 
     <script>
-        let history = [];
+        let currentStudent = 0;
+        let studentHistories = { 0: [], 1: [], 2: [] };  // Per student!
 
-        function updateScore(value) {
-            document.getElementById('scoreValue').textContent = value + '%';
-        }
+        // Update student when changed
+        document.getElementById('studentSelect').addEventListener('change', function () {
+            currentStudent = parseInt(this.value);
+            updateDashboard();
+        });
 
         async function submitQuiz() {
             const studentId = parseInt(document.getElementById('studentSelect').value);
@@ -194,8 +197,9 @@
             });
 
             const result = await response.json();
+            currentStudent = studentId;
 
-            // Show results
+            // Show results 
             document.getElementById('rewardDisplay').innerHTML = `🎉 ${result.reward} 🎉`;
             document.getElementById('rewardDisplay').className = 'reward-display success';
             document.getElementById('explanation').innerHTML = result.explanation;
@@ -203,51 +207,50 @@
             document.getElementById('staticScore').textContent = result.static_score.toFixed(2);
             document.getElementById('rewardSection').style.display = 'block';
 
-            if (result.model_used) {
-                document.getElementById('explanation').innerHTML +=
-                    `<div style="color: #FFD700; font-weight: bold; margin-top: 10px;">✅ ML Confidence: ${Math.round(result.confidence * 100)}%</div>`;
-            }
 
-            // Show dashboard after first quiz
-            document.getElementById('dashboard').style.display = 'block';
+            studentHistories[studentId].push({
+                score: score,
+                adaptive: result.engagement_boost,
+                static_score: result.static_score
+            });
 
-            // Update history
-            history.push({ score: score, adaptive: result.engagement_boost, static_score: result.static_score || score });
+            updateDashboard();
+            loadStudentHistory(studentId);
+        }
+
+        function updateDashboard() {
+            const history = studentHistories[currentStudent];
             document.getElementById('tasksCompleted').textContent = history.length;
             document.getElementById('avgEngagement').textContent =
                 (history.reduce((sum, h) => sum + h.adaptive, 0) / history.length || 0).toFixed(2);
-            document.getElementById('rlBoost').textContent =
-                Math.round(((history[history.length - 1]?.adaptive / history[history.length - 1]?.score || 1) - 1) * 100) + '%';
-            document.getElementById('bestReward').textContent = '👑 Leaderboard';
             updateChart();
+        }
 
+        async function loadStudentHistory(studentId) {
+            const response = await fetch(`/history/${studentId}`);
+            const backendHistory = await response.json();
+            console.log(`Student ${studentId} history:`, backendHistory);
         }
 
         function updateChart() {
+            const history = studentHistories[currentStudent];
             const traces = [
                 {
-                    x: history.map((_, i) => `Quiz ${i + 1}`),
-                    y: history.map(h => h.adaptive),
-                    type: 'scatter', mode: 'lines+markers',
-                    name: 'Adaptive RL',
-                    line: { color: '#4CAF50', width: 4 }
+                    x: history.map((_, i) => `Q${i + 1}`), y: history.map(h => h.adaptive),
+                    type: 'scatter', mode: 'lines+markers', name: 'Adaptive RL', line: { color: '#4CAF50' }
                 },
                 {
-                    x: history.map((_, i) => `Quiz ${i + 1}`),
-                    y: history.map(h => h.score),
-                    type: 'scatter', mode: 'lines+markers',
-                    name: 'Static Baseline',
-                    line: { color: '#FF6B6B', width: 2 }
+                    x: history.map((_, i) => `Q${i + 1}`), y: history.map(h => h.score),
+                    type: 'scatter', mode: 'lines+markers', name: 'Static', line: { color: '#FF6B6B' }
                 }
             ];
-
             Plotly.newPlot('analyticsChart', traces, {
-                title: 'Adaptive RL vs Static Engagement Over Time',
-                xaxis: { title: 'Quiz Sessions' },
-                yaxis: { title: 'Engagement Score' }
+                title: `Student ${currentStudent} Progress`,
+                xaxis: { title: 'Quizzes' }, yaxis: { title: 'Engagement' }
             });
         }
     </script>
+
 </body>
 
 </html>
