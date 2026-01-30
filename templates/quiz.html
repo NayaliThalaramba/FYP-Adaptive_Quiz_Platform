@@ -96,14 +96,25 @@
             margin: 20px 0;
             flex-wrap: wrap;
         }
+
+        .ml-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            display: inline-block;
+            font-size: 14px;
+        }
     </style>
 </head>
 
 <body>
-    <!-- CLEAN TITLE -->
+
     <h1>Adaptive Learning Platform</h1>
 
-    <!-- QUIZ INTERFACE - NO LABELS -->
+    <!-- QUIZ INTERFACE -->
     <div class="quiz-card">
         <div class="controls">
             <div><label>Student: <select id="studentSelect">
@@ -122,6 +133,7 @@
             <div id="rewardDisplay" class="reward-display"></div>
             <div id="explanation"
                 style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin: 10px 0;"></div>
+            <div id="mlConfidence" class="ml-badge" style="display:none;"></div>
             <div class="metrics">
                 <div class="metric">
                     <div class="metric-label">Adaptive RL</div>
@@ -135,7 +147,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD - HIDDEN UNTIL FIRST QUIZ -->
+    <!-- DASHBOARD  -->
     <div id="dashboard" class="quiz-card" style="display:none;">
         <h3>Engagement Analytics</h3>
 
@@ -190,6 +202,11 @@
             document.getElementById('adaptiveScore').textContent = result.engagement_boost.toFixed(2);
             document.getElementById('staticScore').textContent = result.static_score.toFixed(2);
             document.getElementById('rewardSection').style.display = 'block';
+
+            if (result.model_used) {
+                document.getElementById('explanation').innerHTML +=
+                    `<div style="color: #FFD700; font-weight: bold; margin-top: 10px;">✅ ML Confidence: ${Math.round(result.confidence * 100)}%</div>`;
+            }
 
             // Show dashboard after first quiz
             document.getElementById('dashboard').style.display = 'block';
