@@ -11,42 +11,56 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
             text-align: center;
+            color: white;
+
+            /* Background image */
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.75),
+                    rgba(0, 0, 0, 0.75)),
+                url("/static/images/Welcome.jpeg");
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 50px;
+            background: rgba(0, 0, 0, 0.85);
+            /* black container */
+            padding: 55px;
             border-radius: 25px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 650px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
         }
 
         h1 {
             font-size: 3em;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         p {
             font-size: 1.2em;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             opacity: 0.9;
+            line-height: 1.6;
         }
 
         a {
             text-decoration: none;
             background: #FF6B6B;
-            padding: 15px 35px;
+            padding: 15px 40px;
             border-radius: 30px;
             color: white;
             font-size: 18px;
             font-weight: bold;
+            display: inline-block;
+            transition: all 0.3s ease;
         }
 
         a:hover {
             background: #FF5252;
+            transform: translateY(-2px);
         }
     </style>
 </head>
