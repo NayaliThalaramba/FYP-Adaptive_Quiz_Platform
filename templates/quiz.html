@@ -211,7 +211,7 @@
             const result = await response.json();
             currentStudent = studentId;
 
-            document.getElementById('rewardDisplay').innerHTML = `🎉 ${result.reward} 🎉`;
+            document.getElementById('rewardDisplay').innerHTML = ` ${result.reward} `;
             document.getElementById('rewardDisplay').className = 'reward-display success';
             document.getElementById('explanation').innerHTML = result.explanation;
             document.getElementById('adaptiveScore').textContent = result.engagement_boost.toFixed(2);
