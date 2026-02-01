@@ -47,6 +47,17 @@ students_df = pd.DataFrame({
     'motivation_type': ['competitive', 'progress', 'social']
 })
 
+def explain_reward(reward, score, motivation):
+    if reward == '👑 Leaderboard':
+        return "High performance combined with competitive motivation triggered leaderboard-based rewards."
+    elif reward == '📈 Progress Bar':
+        return "Consistent progress patterns indicate progress-based motivation."
+    elif reward == '🏅 Badge':
+        return "Achievement-based rewards were selected due to strong quiz completion."
+    else:
+        return "Point-based rewards were selected to reinforce participation and engagement."
+
+
 @app.route('/quiz', methods=['POST'])
 def take_quiz():
     data = request.json
@@ -73,20 +84,27 @@ def take_quiz():
     
     reward_types = ['⭐ Points', '🏅 Badge', '📈 Progress Bar', '👑 Leaderboard']
     
+    reward_name = reward_types[reward_idx]
+
     return jsonify({
-        'reward': reward_types[reward_idx],
-        'explanation': f"**ML Model** predicted {reward_types[reward_idx]} (history: {len(history)})",
+        'reward': reward_name,
+        'explanation': explain_reward(reward_name, completion_rate, motivation),
         'engagement_boost': current_engagement,
         'static_score': completion_rate,
         'confidence': confidence,
         'history_length': len(student_history[student_id])
     })
 
+
 @app.route('/history/<student_id>')
 def get_history(student_id):
     return jsonify(student_history[str(student_id)][:5])  # Last 5 quizzes
 
 @app.route('/')
+def welcome():
+    return render_template('welcome.html')
+
+@app.route('/start')
 def dashboard():
     return render_template('quiz.html')  
 
