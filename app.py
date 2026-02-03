@@ -22,7 +22,7 @@ def save_history():
         json.dump(student_history, f)
 
 
-# TRAIN RANDOM FOREST MODEL
+# TRAIN ML MODEL (RandomForest)
 np.random.seed(42)
 
 train_data = pd.DataFrame({
@@ -45,56 +45,35 @@ model = RandomForestClassifier(n_estimators=120, random_state=42)
 model.fit(X, y)
 
 
-# STUDENTS & REWARDS
+# CONSTANTS
 reward_types = ['Points', 'Badge', 'Progress Bar', 'Leaderboard']
 
 
-# RULE-BASED XAI (existing)
-def explain_reward(reward, score):
+# XAI (Explainable AI)
+def explain_reward(reward, score, confidence):
     if reward == 'Leaderboard':
-        return "Excellent performance detected. Competitive rewards maximize motivation at high achievement levels."
+        return (
+            "You achieved a very high score. "
+            "The model predicts competitive rewards work best for high performers. "
+            f"(Model confidence: {confidence})"
+        )
     if reward == 'Badge':
-        return "Strong quiz performance rewarded with achievement-based incentives."
+        return (
+            "Strong performance detected. "
+            "Achievement-based rewards reinforce mastery and motivation."
+        )
     if reward == 'Progress Bar':
-        return "Moderate performance benefits from progress visualization to sustain engagement."
-    return "Participation-based rewards help encourage continued learning."
-
-
-# MODEL-BASED XAI (NEW)
-feature_names = [
-    "Quiz Score",
-    "Time Spent",
-    "Previous Engagement",
-    "Motivation Type"
-]
-
-def explain_model_decision(features):
-    importances = model.feature_importances_
-
-    ranked = sorted(
-        zip(feature_names, importances),
-        key=lambda x: x[1],
-        reverse=True
+        return (
+            "Moderate performance observed. "
+            "Progress-based feedback helps maintain engagement and learning momentum."
+        )
+    return (
+        "Lower performance detected. "
+        "Participation rewards encourage continued effort without pressure."
     )
 
-    summary = (
-        f"The adaptive reward was mainly influenced by "
-        f"{ranked[0][0]} and {ranked[1][0]}, "
-        f"with supporting impact from {ranked[2][0]}."
-    )
 
-    details = [
-        {
-            "feature": name,
-            "importance": round(float(weight), 2)
-        }
-        for name, weight in ranked
-    ]
-
-    return summary, details
-
-
-# MAIN QUIZ ROUTE
+# MAIN QUIZ API
 @app.route('/quiz', methods=['POST'])
 def take_quiz():
     data = request.json
@@ -108,12 +87,12 @@ def take_quiz():
     history = student_history[student_id]
     prev_engagement = history[-1][2] if history else 0.6
 
+    # ML Prediction
     features = np.array([[score, time_spent, prev_engagement, motivation]])
+    ml_probs = model.predict_proba(features)[0]
+    confidence = round(float(np.max(ml_probs)), 2)
 
-    # ML prediction 
-    confidence = round(np.max(model.predict_proba(features)), 2)
-
-    # RULE-BASED ADAPTIVE LOGIC
+    # Rule-based adaptive logic 
     if score >= 0.9:
         reward_idx = 3
     elif score >= 0.75:
@@ -127,21 +106,21 @@ def take_quiz():
 
     engagement_boost = round(score * 1.3, 2)
 
-    student_history[student_id].append([score, time_spent, engagement_boost])
+    student_history[student_id].append([
+        score,
+        time_spent,
+        engagement_boost
+    ])
+
     save_history()
 
-    # XAI
-    xai_summary, xai_features = explain_model_decision(features)
-
     return jsonify({
-        "reward": reward_name,
-        "explanation": explain_reward(reward_name, score),
-        "xai_summary": xai_summary,
-        "xai_features": xai_features,
-        "engagement_boost": engagement_boost,
-        "static_score": score,
-        "confidence": confidence,
-        "history_length": len(student_history[student_id])
+        'reward': reward_name,
+        'explanation': explain_reward(reward_name, score, confidence),
+        'engagement_boost': engagement_boost,
+        'static_score': score,
+        'confidence': confidence,
+        'history_length': len(student_history[student_id])
     })
 
 
@@ -155,4 +134,4 @@ def dashboard():
     return render_template('quiz.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
