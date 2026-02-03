@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 
 
-# PERSISTENT STUDENT HISTORY
+# Persistent student history
 HISTORY_FILE = 'student_history.json'
 
 if os.path.exists(HISTORY_FILE):
@@ -22,7 +22,7 @@ def save_history():
         json.dump(student_history, f)
 
 
-# TRAIN ML MODEL (RandomForest)
+# Train ML model (RandomForest)
 np.random.seed(42)
 
 train_data = pd.DataFrame({
@@ -44,12 +44,10 @@ y = train_data['optimal_reward']
 model = RandomForestClassifier(n_estimators=120, random_state=42)
 model.fit(X, y)
 
-
-# CONSTANTS
 reward_types = ['Points', 'Badge', 'Progress Bar', 'Leaderboard']
 
 
-# XAI (Explainable AI)
+# XAI
 def explain_reward(reward, score, confidence):
     if reward == 'Leaderboard':
         return (
@@ -73,7 +71,7 @@ def explain_reward(reward, score, confidence):
     )
 
 
-# MAIN QUIZ API
+# Main Quiz API
 @app.route('/quiz', methods=['POST'])
 def take_quiz():
     data = request.json
@@ -124,7 +122,7 @@ def take_quiz():
     })
 
 
-# ROUTES
+# Routes
 @app.route('/')
 def welcome():
     return render_template('welcome.html')
