@@ -16,98 +16,34 @@
             text-align: center;
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 30px;
-        }
-
         .quiz-card {
             background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             margin: 20px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .reward-display {
-            font-size: 2em;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .success {
-            background: #F8CF00;
-            color: #000;
         }
 
         button {
             background: #FF6B6B;
-            color: white;
             border: none;
             padding: 15px 30px;
             border-radius: 25px;
+            color: white;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        button:hover {
-            background: #FF5252;
-            transform: translateY(-2px);
         }
 
         input,
         select {
-            padding: 12px;
+            padding: 10px;
             border-radius: 10px;
             border: none;
             margin: 10px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .metrics {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-
-        .metric {
-            text-align: center;
-        }
-
-        .metric-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-            margin-bottom: 5px;
         }
 
         .metric-value {
-            font-size: 2em;
-            font-weight: bold;
+            font-size: 1.8em;
             color: #FFD700;
-        }
-
-        .controls {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .ml-badge {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: #000;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-top: 10px;
-            display: inline-block;
-            font-size: 14px;
         }
     </style>
 </head>
@@ -116,151 +52,66 @@
 
     <h1>Adaptive Learning Platform</h1>
 
-    <!-- QUIZ INTERFACE -->
     <div class="quiz-card">
-        <div class="controls">
-            <div>
-                <label>Student:
-                    <select id="studentSelect">
-                        <option value="0">Alice (Competitive)</option>
-                        <option value="1">Bob (Progress)</option>
-                        <option value="2">Charlie (Social)</option>
-                    </select>
-                </label>
-            </div>
+        <label>Student:
+            <select id="studentSelect">
+                <option value="0">Alice (Competitive)</option>
+                <option value="1">Bob (Progress)</option>
+                <option value="2">Charlie (Social)</option>
+            </select>
+        </label>
 
-            <div>
-                <label>Quiz Score:
-                    <input type="range" id="score" min="0" max="100" value="75" oninput="updateScore(this.value)">
-                    <span id="scoreValue">75%</span>
-                </label>
-            </div>
+        <br>
 
-            <div>
-                <label>Time (min):
-                    <input type="number" id="time" value="20" min="1" max="60">
-                </label>
-            </div>
+        <label>Quiz Score:
+            <input type="range" id="score" min="0" max="100" value="75"
+                oninput="scoreValue.innerText = this.value + '%'">
+            <span id="scoreValue">75%</span>
+        </label>
+
+        <br>
+
+        <label>Time (min):
+            <input type="number" id="time" value="20" min="1" max="60">
+        </label>
+
+        <br><br>
+
+        <button onclick="submitQuiz()">🚀 Complete Quiz</button>
+
+        <div id="result" style="display:none; margin-top:20px;">
+            <h2 id="reward"></h2>
+            <p id="ruleExplanation"></p>
+            <p><strong>XAI Explanation:</strong><br><span id="xaiExplanation"></span></p>
+
+            <p>Adaptive Score: <span class="metric-value" id="adaptive"></span></p>
+            <p>Static Score: <span class="metric-value" id="static"></span></p>
+            <p>Model Confidence: <span class="metric-value" id="confidence"></span></p>
         </div>
-
-        <button onclick="submitQuiz()">🚀 Complete Quiz & Get Smart Reward</button>
-
-        <div id="rewardSection" style="display:none;">
-            <div id="rewardDisplay" class="reward-display"></div>
-            <div id="explanation"
-                style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin: 10px 0;"></div>
-
-            <div class="metrics">
-                <div class="metric">
-                    <div class="metric-label">Adaptive RL</div>
-                    <div id="adaptiveScore" class="metric-value">0.0</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Static Baseline</div>
-                    <div id="staticScore" class="metric-value">0.0</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="quiz-card" style="display:none;">
-        <h3>Engagement Analytics</h3>
-
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;">
-            <div class="metric">
-                <div class="metric-label">Tasks Completed</div>
-                <div class="metric-value" id="tasksCompleted">0</div>
-            </div>
-            <div class="metric">
-                <div class="metric-label">Avg Engagement</div>
-                <div class="metric-value" id="avgEngagement">0.0</div>
-            </div>
-        </div>
-
-        <div id="analyticsChart" style="height: 350px;"></div>
     </div>
 
     <script>
-        let currentStudent = 0;
-        let studentHistories = { 0: [], 1: [], 2: [] };
-
-        function updateScore(value) {
-            document.getElementById('scoreValue').textContent = value + "%";
-        }
-
-        document.getElementById('studentSelect').addEventListener('change', function () {
-            currentStudent = parseInt(this.value);
-            updateDashboard();
-        });
-
         async function submitQuiz() {
-            const studentId = parseInt(document.getElementById('studentSelect').value);
-            const score = parseInt(document.getElementById('score').value) / 100;
-            const time = parseFloat(document.getElementById('time').value);
-
             const response = await fetch('/quiz', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    student_id: studentId,
-                    completion_rate: score,
-                    session_duration: time
+                    student_id: document.getElementById('studentSelect').value,
+                    completion_rate: document.getElementById('score').value / 100,
+                    session_duration: document.getElementById('time').value
                 })
             });
 
-            const result = await response.json();
-            currentStudent = studentId;
+            const data = await response.json();
 
-            document.getElementById('rewardDisplay').innerHTML = ` ${result.reward} `;
-            document.getElementById('rewardDisplay').className = 'reward-display success';
-            document.getElementById('explanation').innerHTML = result.explanation;
-            document.getElementById('adaptiveScore').textContent = result.engagement_boost.toFixed(2);
-            document.getElementById('staticScore').textContent = result.static_score.toFixed(2);
+            document.getElementById('reward').innerText = data.reward;
+            document.getElementById('ruleExplanation').innerText = data.explanation;
+            document.getElementById('xaiExplanation').innerText = data.xai_summary;
+            document.getElementById('adaptive').innerText = data.engagement_boost;
+            document.getElementById('static').innerText = data.static_score;
+            document.getElementById('confidence').innerText = data.confidence;
 
-            document.getElementById('rewardSection').style.display = 'block';
-            document.getElementById('dashboard').style.display = 'block';
-
-            studentHistories[studentId].push({
-                score: score,
-                adaptive: result.engagement_boost
-            });
-
-            updateDashboard();
-        }
-
-        function updateDashboard() {
-            const history = studentHistories[currentStudent];
-            document.getElementById('tasksCompleted').textContent = history.length;
-            document.getElementById('avgEngagement').textContent =
-                (history.reduce((sum, h) => sum + h.adaptive, 0) / history.length || 0).toFixed(2);
-            updateChart();
-        }
-
-        function updateChart() {
-            const history = studentHistories[currentStudent];
-            const traces = [
-                {
-                    x: history.map((_, i) => `Q${i + 1}`),
-                    y: history.map(h => h.adaptive),
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'Adaptive RL'
-                },
-                {
-                    x: history.map((_, i) => `Q${i + 1}`),
-                    y: history.map(h => h.score),
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'Static Baseline'
-                }
-            ];
-
-            Plotly.newPlot('analyticsChart', traces, {
-                title: `Student ${currentStudent} Progress`,
-                xaxis: { title: 'Quizzes' },
-                yaxis: { title: 'Engagement' }
-            });
+            document.getElementById('result').style.display = 'block';
         }
     </script>
 
