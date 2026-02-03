@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 
 
-# Persistent Student History
+# PERSISTENT STUDENT HISTORY
 HISTORY_FILE = 'student_history.json'
 
 if os.path.exists(HISTORY_FILE):
@@ -22,7 +22,7 @@ def save_history():
         json.dump(student_history, f)
 
 
-# Train random forest model
+# TRAIN RANDOM FOREST MODEL
 np.random.seed(42)
 
 train_data = pd.DataFrame({
@@ -45,39 +45,11 @@ model = RandomForestClassifier(n_estimators=120, random_state=42)
 model.fit(X, y)
 
 
-# Feature-level XAI
-feature_names = [
-    'Quiz Score',
-    'Time Spent',
-    'Previous Engagement',
-    'Motivation Type'
-]
-
-def explain_features(features):
-    importances = model.feature_importances_
-
-    contributions = []
-    for name, importance, value in zip(feature_names, importances, features[0]):
-        contributions.append({
-            "feature": name,
-            "importance": round(float(importance), 2),
-            "value": round(float(value), 2)
-        })
-
-    contributions = sorted(contributions, key=lambda x: x["importance"], reverse=True)
-
-    explanation_text = (
-        "This reward decision was mainly influenced by "
-        + ", ".join([f"{c['feature']} ({int(c['importance']*100)}%)" for c in contributions[:3]])
-        + "."
-    )
-
-    return explanation_text, contributions
-
-
-# Students & Rewards
+# STUDENTS & REWARDS
 reward_types = ['Points', 'Badge', 'Progress Bar', 'Leaderboard']
 
+
+# RULE-BASED XAI (existing)
 def explain_reward(reward, score):
     if reward == 'Leaderboard':
         return "Excellent performance detected. Competitive rewards maximize motivation at high achievement levels."
@@ -88,7 +60,41 @@ def explain_reward(reward, score):
     return "Participation-based rewards help encourage continued learning."
 
 
-# Main Quiz Route
+# MODEL-BASED XAI (NEW)
+feature_names = [
+    "Quiz Score",
+    "Time Spent",
+    "Previous Engagement",
+    "Motivation Type"
+]
+
+def explain_model_decision(features):
+    importances = model.feature_importances_
+
+    ranked = sorted(
+        zip(feature_names, importances),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    summary = (
+        f"The adaptive reward was mainly influenced by "
+        f"{ranked[0][0]} and {ranked[1][0]}, "
+        f"with supporting impact from {ranked[2][0]}."
+    )
+
+    details = [
+        {
+            "feature": name,
+            "importance": round(float(weight), 2)
+        }
+        for name, weight in ranked
+    ]
+
+    return summary, details
+
+
+# MAIN QUIZ ROUTE
 @app.route('/quiz', methods=['POST'])
 def take_quiz():
     data = request.json
@@ -102,14 +108,12 @@ def take_quiz():
     history = student_history[student_id]
     prev_engagement = history[-1][2] if history else 0.6
 
-    # ML Features
     features = np.array([[score, time_spent, prev_engagement, motivation]])
 
     # ML prediction 
-    model.predict(features)
     confidence = round(np.max(model.predict_proba(features)), 2)
 
-    # Rule based adaptive logic
+    # RULE-BASED ADAPTIVE LOGIC
     if score >= 0.9:
         reward_idx = 3
     elif score >= 0.75:
@@ -127,7 +131,7 @@ def take_quiz():
     save_history()
 
     # XAI
-    xai_summary, xai_features = explain_features(features)
+    xai_summary, xai_features = explain_model_decision(features)
 
     return jsonify({
         "reward": reward_name,
@@ -141,7 +145,7 @@ def take_quiz():
     })
 
 
-# Routes
+# ROUTES
 @app.route('/')
 def welcome():
     return render_template('welcome.html')

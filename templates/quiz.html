@@ -16,33 +16,61 @@
             text-align: center;
         }
 
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
         .quiz-card {
             background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .reward-display {
+            font-size: 2em;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .success {
+            background: #F8CF00;
+            color: #000;
         }
 
         button {
             background: #FF6B6B;
+            color: white;
             border: none;
             padding: 15px 30px;
             border-radius: 25px;
-            color: white;
             font-size: 16px;
             cursor: pointer;
         }
 
         input,
         select {
-            padding: 10px;
+            padding: 12px;
             border-radius: 10px;
             border: none;
             margin: 10px;
+            font-size: 16px;
+        }
+
+        .metrics {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
         }
 
         .metric-value {
-            font-size: 1.8em;
+            font-size: 2em;
+            font-weight: bold;
             color: #FFD700;
         }
     </style>
@@ -53,44 +81,54 @@
     <h1>Adaptive Learning Platform</h1>
 
     <div class="quiz-card">
-        <label>Student:
+        <div class="controls">
             <select id="studentSelect">
                 <option value="0">Alice (Competitive)</option>
                 <option value="1">Bob (Progress)</option>
                 <option value="2">Charlie (Social)</option>
             </select>
-        </label>
 
-        <br>
-
-        <label>Quiz Score:
             <input type="range" id="score" min="0" max="100" value="75"
                 oninput="scoreValue.innerText = this.value + '%'">
             <span id="scoreValue">75%</span>
-        </label>
 
-        <br>
-
-        <label>Time (min):
             <input type="number" id="time" value="20" min="1" max="60">
-        </label>
+        </div>
 
-        <br><br>
+        <button onclick="submitQuiz()">🚀 Complete Quiz & Get Smart Reward</button>
 
-        <button onclick="submitQuiz()">🚀 Complete Quiz</button>
+        <div id="rewardSection" style="display:none;">
+            <div id="rewardDisplay" class="reward-display"></div>
 
-        <div id="result" style="display:none; margin-top:20px;">
-            <h2 id="reward"></h2>
-            <p id="ruleExplanation"></p>
-            <p><strong>XAI Explanation:</strong><br><span id="xaiExplanation"></span></p>
+            <div id="explanation" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;"></div>
 
-            <p>Adaptive Score: <span class="metric-value" id="adaptive"></span></p>
-            <p>Static Score: <span class="metric-value" id="static"></span></p>
-            <p>Model Confidence: <span class="metric-value" id="confidence"></span></p>
+            <!-- NEW XAI BOX -->
+            <div id="xaiBox"
+                style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-top: 10px;">
+            </div>
+
+            <div class="metrics">
+                <div>
+                    Adaptive RL
+                    <div id="adaptiveScore" class="metric-value">0.0</div>
+                </div>
+                <div>
+                    Static Baseline
+                    <div id="staticScore" class="metric-value">0.0</div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div id="dashboard" class="quiz-card" style="display:none;">
+        <h3>Engagement Analytics</h3>
+        <div id="analyticsChart" style="height: 350px;"></div>
+    </div>
+
     <script>
+        let currentStudent = 0;
+        let studentHistories = { 0: [], 1: [], 2: [] };
+
         async function submitQuiz() {
             const response = await fetch('/quiz', {
                 method: 'POST',
@@ -102,16 +140,46 @@
                 })
             });
 
-            const data = await response.json();
+            const result = await response.json();
+            currentStudent = document.getElementById('studentSelect').value;
 
-            document.getElementById('reward').innerText = data.reward;
-            document.getElementById('ruleExplanation').innerText = data.explanation;
-            document.getElementById('xaiExplanation').innerText = data.xai_summary;
-            document.getElementById('adaptive').innerText = data.engagement_boost;
-            document.getElementById('static').innerText = data.static_score;
-            document.getElementById('confidence').innerText = data.confidence;
+            document.getElementById('rewardDisplay').innerHTML = result.reward;
+            document.getElementById('rewardDisplay').className = 'reward-display success';
+            document.getElementById('explanation').innerHTML = result.explanation;
+            document.getElementById('xaiBox').innerHTML =
+                "<strong>XAI Insight:</strong><br>" + result.xai_summary;
 
-            document.getElementById('result').style.display = 'block';
+            document.getElementById('adaptiveScore').innerText = result.engagement_boost;
+            document.getElementById('staticScore').innerText = result.static_score;
+
+            document.getElementById('rewardSection').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'block';
+
+            studentHistories[currentStudent].push({
+                score: result.static_score,
+                adaptive: result.engagement_boost
+            });
+
+            updateChart();
+        }
+
+        function updateChart() {
+            const history = studentHistories[currentStudent];
+
+            Plotly.newPlot('analyticsChart', [
+                {
+                    x: history.map((_, i) => `Q${i + 1}`),
+                    y: history.map(h => h.adaptive),
+                    mode: 'lines+markers',
+                    name: 'Adaptive RL'
+                },
+                {
+                    x: history.map((_, i) => `Q${i + 1}`),
+                    y: history.map(h => h.score),
+                    mode: 'lines+markers',
+                    name: 'Static Baseline'
+                }
+            ]);
         }
     </script>
 
