@@ -1,9 +1,9 @@
 flask==3.0.3
 pandas==2.2.3
-numpy==2.1.1
+numpy==1.26.4
 plotly==5.24.0
 gunicorn==23.0.0
 scikit-learn==1.5.1
 stable-baselines3==2.3.2
-torch==2.3.0
+torch==2.5.0
 gymnasium==1.0.0
