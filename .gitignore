@@ -1,0 +1,10 @@
+# Large data files
+data/*.csv
+*.zip
+ppo_quiz*.zip
+__pycache__/
+*.pyc
+student_history.json
+venv/
+env/
+.DS_Store
