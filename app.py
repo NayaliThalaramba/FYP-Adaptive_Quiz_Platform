@@ -116,26 +116,27 @@ def take_quiz():
         questions_seen = len(student_history[student_id])
         history = student_history[student_id]
         
-        # Fix state scaling to match QuizEnv training
-        last_difficulty = 1.0  # Default medium
+        last_reward = 0.0
         if history:
-            last_engagement = history[-1][2]
-            last_difficulty = min(last_engagement / 2.0, 2.0)  # Scale properly
+            last_entry = history[-1]
+            if len(last_entry) >= 4:
+                last_reward = float(last_entry[3])
+            else:
+                last_reward = 0.0  
         
         avg_confidence = 0.5
         if history:
             recent_scores = [h[0] for h in history[-3:]]
             avg_confidence = np.mean(recent_scores)
         
-        # STATE EXACTLY like QuizEnv: [norm_score, difficulty, questions_seen, confidence]
         obs = np.array([
-            score,                           # 0.0-1.0
-            last_difficulty,                 # 0.0-2.0  
-            min(float(questions_seen), 20.0), # Cap at 20
-            avg_confidence                   # 0.0-1.0
+            score,
+            last_reward,
+            min(float(questions_seen), 20.0),
+            avg_confidence
         ], dtype=np.float32).reshape(1, -1)
         
-        print(f"DEBUG: FIXED state=[{score:.2f}, {last_difficulty:.2f}, {min(questions_seen,20):.0f}, {avg_confidence:.2f}]")
+        print(f"DEBUG: state=[{score:.2f}, {last_reward:.2f}, {min(questions_seen,20):.0f}, {avg_confidence:.2f}]")
         
         if ppa_model is None:
             # Rule-based fallback
@@ -144,20 +145,10 @@ def take_quiz():
             elif score >= 0.6: return 2
             return 0
         
-        action, _ = ppa_model.predict(obs, deterministic=False)
-        raw_action = action[0]
-        
-        # Force variation if PPO is stuck (RL + rules hybrid)
-        if score < 0.5:
-            reward_idx = 0  # Points for low performers
-        elif score < 0.85:
-            reward_idx = 1  # Badge for medium-low
-        elif score < 0.95:
-            reward_idx = 2  # Progress Bar for medium-high
-        else:
-            reward_idx = 3  # Leaderboard for elite performers
+        action, _ = ppa_model.predict(obs, deterministic=True)
+        reward_idx = int(action[0])
 
-        print(f"DEBUG: raw_action={raw_action:.2f} → reward_idx={reward_idx}")
+        print(f"DEBUG: PPO chose reward_idx={reward_idx}")
         return reward_idx
 
     reward_idx = get_reward_from_ppo(score, time_spent, prev_engagement, motivation, ppa_model)
@@ -171,7 +162,8 @@ def take_quiz():
     student_history[student_id].append([
         score,
         time_spent,
-        engagement_boost
+        engagement_boost,
+        reward_idx
     ])
 
     save_history()
