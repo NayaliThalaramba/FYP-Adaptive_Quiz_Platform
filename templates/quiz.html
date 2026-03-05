@@ -115,20 +115,13 @@
 <body>
 
     <h1>Adaptive Learning Platform</h1>
+    <a href="{{ url_for('profile') }}">
+        <button>View My Profile</button>
+    </a>
 
     <!-- QUIZ INTERFACE -->
     <div class="quiz-card">
         <div class="controls">
-            <div>
-                <label>Student:
-                    <select id="studentSelect">
-                        <option value="0">Alice (Competitive)</option>
-                        <option value="1">Bob (Progress)</option>
-                        <option value="2">Charlie (Social)</option>
-                    </select>
-                </label>
-            </div>
-
             <div>
                 <label>Quiz Score:
                     <input type="range" id="score" min="0" max="100" value="75" oninput="updateScore(this.value)">
@@ -182,20 +175,13 @@
     </div>
 
     <script>
-        let currentStudent = 0;
-        let studentHistories = { 0: [], 1: [], 2: [] };
+        let history = [];
 
         function updateScore(value) {
             document.getElementById('scoreValue').textContent = value + "%";
         }
 
-        document.getElementById('studentSelect').addEventListener('change', function () {
-            currentStudent = parseInt(this.value);
-            updateDashboard();
-        });
-
         async function submitQuiz() {
-            const studentId = parseInt(document.getElementById('studentSelect').value);
             const score = parseInt(document.getElementById('score').value) / 100;
             const time = parseFloat(document.getElementById('time').value);
 
@@ -203,16 +189,15 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    student_id: studentId,
                     completion_rate: score,
                     session_duration: time
                 })
             });
 
             const result = await response.json();
-            currentStudent = studentId;
 
-            document.getElementById('rewardDisplay').innerHTML = ` ${result.reward} `;
+            // Show reward section
+            document.getElementById('rewardDisplay').innerHTML = result.reward;
             document.getElementById('rewardDisplay').className = 'reward-display success';
             document.getElementById('explanation').innerHTML = result.explanation;
             document.getElementById('adaptiveScore').textContent = result.engagement_boost.toFixed(2);
@@ -221,7 +206,8 @@
             document.getElementById('rewardSection').style.display = 'block';
             document.getElementById('dashboard').style.display = 'block';
 
-            studentHistories[studentId].push({
+            // Store local history (for chart only)
+            history.push({
                 score: score,
                 adaptive: result.engagement_boost
             });
@@ -230,15 +216,18 @@
         }
 
         function updateDashboard() {
-            const history = studentHistories[currentStudent];
             document.getElementById('tasksCompleted').textContent = history.length;
-            document.getElementById('avgEngagement').textContent =
-                (history.reduce((sum, h) => sum + h.adaptive, 0) / history.length || 0).toFixed(2);
+
+            const avg = history.length
+                ? history.reduce((sum, h) => sum + h.adaptive, 0) / history.length
+                : 0;
+
+            document.getElementById('avgEngagement').textContent = avg.toFixed(2);
+
             updateChart();
         }
 
         function updateChart() {
-            const history = studentHistories[currentStudent];
             const traces = [
                 {
                     x: history.map((_, i) => `Q${i + 1}`),
@@ -257,7 +246,7 @@
             ];
 
             Plotly.newPlot('analyticsChart', traces, {
-                title: `Student ${currentStudent} Progress`,
+                title: `Your Engagement Progress`,
                 xaxis: { title: 'Quizzes' },
                 yaxis: { title: 'Engagement' }
             });

@@ -1,27 +1,30 @@
+from flask import redirect, url_for, flash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User, QuizAttempt
 from stable_baselines3 import PPO
 from src.quiz_env import QuizEnv
 import numpy as np
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-import json
-import os
 
 app = Flask(__name__)
 MAX_QUESTIONS = 20
 
-# Persistent student history
-HISTORY_FILE = 'student_history.json'
+app.config['SECRET_KEY'] = 'supersecretkey'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-if os.path.exists(HISTORY_FILE):
-    with open(HISTORY_FILE, 'r') as f:
-        student_history = json.load(f)
-else:
-    student_history = {str(i): [] for i in range(3)}
+db.init_app(app)
 
-def save_history():
-    with open(HISTORY_FILE, 'w') as f:
-        json.dump(student_history, f)
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 PPO_MODEL_PATH = "ppo_quiz_final"
 
@@ -94,79 +97,74 @@ def explain_reward(reward, score, confidence):
 
 # Main Quiz API
 @app.route('/quiz', methods=['POST'])
+@login_required
 def take_quiz():
     data = request.json
 
-    student_id = str(data['student_id'])
     score = float(data['completion_rate'])
     time_spent = float(data['session_duration'])
 
-    motivation = int(student_id)  
+    # Fetch previous attempts from DB
+    attempts = QuizAttempt.query.filter_by(
+        user_id=current_user.id
+    ).order_by(QuizAttempt.id).all()
 
-    history = student_history[student_id]
-    prev_engagement = history[-1][2] if history else 0.6
+    questions_seen = len(attempts)
+
+    last_reward = 0.0
+    if attempts:
+        last_reward = reward_types.index(attempts[-1].reward_type)
+
+    avg_confidence = 0.5
+    if attempts:
+        recent_scores = [a.score for a in attempts[-3:]]
+        avg_confidence = np.mean(recent_scores)
 
     # ML Prediction
+    motivation = current_user.id
+    prev_engagement = avg_confidence
+
     features = np.array([[score, time_spent, prev_engagement, motivation]])
     ml_probs = model.predict_proba(features)[0]
     confidence = round(float(np.max(ml_probs)), 2)
 
-    # Rule-based adaptive logic 
-    def get_reward_from_ppo(score, time_spent, prev_engagement, motivation, ppa_model):
-        questions_seen = len(student_history[student_id])
-        history = student_history[student_id]
-        
-        last_reward = 0.0
-        if history:
-            last_entry = history[-1]
-            if len(last_entry) >= 4:
-                last_reward = float(last_entry[3])
-            else:
-                last_reward = 0.0  
-        
-        avg_confidence = 0.5
-        if history:
-            recent_scores = [h[0] for h in history[-3:]]
-            avg_confidence = np.mean(recent_scores)
-        
-        obs = np.array([
-            score,
-            last_reward,
-            min(float(questions_seen), 20.0),
-            avg_confidence
-        ], dtype=np.float32).reshape(1, -1)
-        
-        print(f"DEBUG: state=[{score:.2f}, {last_reward:.2f}, {min(questions_seen,20):.0f}, {avg_confidence:.2f}]")
-        
-        if ppa_model is None:
-            # Rule-based fallback
-            if score >= 0.9: return 3
-            elif score >= 0.75: return 1
-            elif score >= 0.6: return 2
-            return 0
-        
+    # PPO State
+    obs = np.array([
+        score,
+        last_reward,
+        min(float(questions_seen), 20.0),
+        avg_confidence
+    ], dtype=np.float32).reshape(1, -1)
+
+    print(f"DEBUG: state={obs}")
+
+    if ppa_model is None:
+        if score >= 0.9:
+            reward_idx = 3
+        elif score >= 0.75:
+            reward_idx = 1
+        elif score >= 0.6:
+            reward_idx = 2
+        else:
+            reward_idx = 0
+    else:
         action, _ = ppa_model.predict(obs, deterministic=True)
         reward_idx = int(action[0])
 
-        print(f"DEBUG: PPO chose reward_idx={reward_idx}")
-        return reward_idx
-
-    reward_idx = get_reward_from_ppo(score, time_spent, prev_engagement, motivation, ppa_model)
-    print("DEBUG: reward_idx =", reward_idx)
-
-
     reward_name = reward_types[reward_idx]
-
     engagement_boost = round(score * 1.3, 2)
 
-    student_history[student_id].append([
-        score,
-        time_spent,
-        engagement_boost,
-        reward_idx
-    ])
+    # Store in DB
+    new_attempt = QuizAttempt(
+        score=score,
+        time_spent=time_spent,
+        engagement_boost=engagement_boost,
+        reward_type=reward_name,
+        user_id=current_user.id
+    )
 
-    save_history()
+    db.session.add(new_attempt)
+    db.session.commit()
 
     return jsonify({
         'reward': reward_name,
@@ -174,9 +172,107 @@ def take_quiz():
         'engagement_boost': engagement_boost,
         'static_score': score,
         'confidence': confidence,
-        'history_length': len(student_history[student_id])
+        'history_length': questions_seen + 1
     })
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
+
+        if User.query.filter_by(username=username).first():
+            return "Username already exists"
+
+        if User.query.filter_by(email=email).first():
+            return "Email already registered"
+
+        hashed_pw = generate_password_hash(password)
+
+        new_user = User(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            username=username,
+            password=hashed_pw
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('dashboard'))
+
+        return "Invalid credentials"
+
+    return render_template('login.html')
+
+@app.route('/profile')
+@login_required
+def profile():
+    attempts = QuizAttempt.query.filter_by(
+        user_id=current_user.id
+    ).order_by(QuizAttempt.id).all()
+
+    total_attempts = len(attempts)
+
+    avg_score = round(
+        sum(a.score for a in attempts) / total_attempts, 2
+    ) if total_attempts > 0 else 0
+
+    scores = [a.score for a in attempts]
+    engagement = [a.engagement_boost for a in attempts]
+
+    return render_template(
+        'profile.html',
+        user=current_user,
+        total_attempts=total_attempts,
+        avg_score=avg_score,
+        attempts=attempts,
+        scores=scores,
+        engagement=engagement
+    )
+
+@app.route('/leaderboard')
+@login_required
+def leaderboard():
+
+    users = User.query.all()
+    leaderboard_data = []
+
+    for user in users:
+        attempts = QuizAttempt.query.filter_by(user_id=user.id).all()
+
+        if attempts:
+            avg_score = sum(a.score for a in attempts) / len(attempts)
+            total_engagement = sum(a.engagement_boost for a in attempts)
+
+            leaderboard_data.append({
+                "username": user.username,
+                "avg_score": round(avg_score, 2),
+                "engagement": round(total_engagement, 2),
+                "attempts": len(attempts)
+            })
+
+    leaderboard_data.sort(key=lambda x: x["engagement"], reverse=True)
+
+    return render_template("leaderboard.html", leaderboard=leaderboard_data)
 
 # Routes
 @app.route('/')
@@ -184,8 +280,18 @@ def welcome():
     return render_template('welcome.html')
 
 @app.route('/start')
+@login_required
 def dashboard():
     return render_template('quiz.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('welcome'))
+
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)

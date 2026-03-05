@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Leaderboard</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #FEA719 0%, #E9650E 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #FFD700;
+            color: black;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        a {
+            color: #FFD700;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .rank-1 {
+            color: gold;
+            font-weight: bold;
+        }
+
+        .rank-2 {
+            color: silver;
+            font-weight: bold;
+        }
+
+        .rank-3 {
+            color: #cd7f32;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Leaderboard</h2>
+
+        <table>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Avg Score</th>
+                <th>Total Engagement</th>
+                <th>Attempts</th>
+            </tr>
+
+            {% for user in leaderboard %}
+            <tr>
+                <td class="
+                    {% if loop.index == 1 %}rank-1
+                    {% elif loop.index == 2 %}rank-2
+                    {% elif loop.index == 3 %}rank-3
+                    {% endif %}
+                ">
+                    {{ loop.index }}
+                </td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.avg_score }}</td>
+                <td>{{ user.engagement }}</td>
+                <td>{{ user.attempts }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
+        <a href="{{ url_for('profile') }}">My Profile</a> |
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+</body>
+
+</html>

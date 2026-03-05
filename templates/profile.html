@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profile</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #FEA719 0%, #E9650E 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 2em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        a {
+            color: #FFD700;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+        <p>{{ user.email }}</p>
+
+        <div class="stats">
+            <div class="stat">
+                <div>Total Attempts</div>
+                <div class="stat-value">{{ total_attempts }}</div>
+            </div>
+
+            <div class="stat">
+                <div>Average Score</div>
+                <div class="stat-value">{{ avg_score }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Performance Analytics</h3>
+        <div id="profileChart" style="height:400px;"></div>
+    </div>
+
+    <div class="card">
+        <h3>Recent Attempts</h3>
+        <ul>
+            {% for a in attempts %}
+            <li>
+                Score: {{ a.score }} |
+                Reward: {{ a.reward_type }} |
+                Engagement: {{ a.engagement_boost }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card">
+        <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
+        <a href="{{ url_for('leaderboard') }}">Leaderboard</a> |
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+    <script>
+        const scores = JSON.parse('{{ scores|tojson|safe }}');
+        const engagement = JSON.parse('{{ engagement|tojson|safe }}');
+
+        if (scores.length > 0) {
+            const traces = [
+                {
+                    x: scores.map((_, i) => `Quiz ${i + 1}`),
+                    y: scores,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Score'
+                },
+                {
+                    x: engagement.map((_, i) => `Quiz ${i + 1}`),
+                    y: engagement,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Engagement Boost'
+                }
+            ];
+
+            Plotly.newPlot('profileChart', traces, {
+                title: "Performance Over Time",
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' }
+            });
+        }
+    </script>
+
+</body>
+
+</html>
