@@ -8,3 +8,6 @@ student_history.json
 venv/
 env/
 .DS_Store
+instance/
+users.db
+*.backup
