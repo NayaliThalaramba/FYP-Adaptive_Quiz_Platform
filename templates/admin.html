@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Analytics Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #FEA719 0%, #E9650E 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.75);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Admin Analytics Dashboard</h1>
+
+    <div class="card">
+
+        <div class="stats">
+
+            <div>
+                <div>Total Users</div>
+                <div class="stat-value">{{ total_users }}</div>
+            </div>
+
+            <div>
+                <div>Total Quiz Attempts</div>
+                <div class="stat-value">{{ total_attempts }}</div>
+            </div>
+
+            <div>
+                <div>Average Engagement</div>
+                <div class="stat-value">{{ avg_engagement }}</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+        <h3>Reward Distribution</h3>
+        <div id="rewardChart"></div>
+    </div>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+    <script>
+
+        const rewards = JSON.parse('{{ reward_counts | tojson | safe }}');
+
+        const data = [{
+            labels: Object.keys(rewards),
+            values: Object.values(rewards),
+            type: 'pie',
+            hole: 0.4
+        }];
+
+        Plotly.newPlot('rewardChart', data, {
+            title: 'Gamification Reward Distribution'
+        });
+
+    </script>
+
+</body>
+
+</html>

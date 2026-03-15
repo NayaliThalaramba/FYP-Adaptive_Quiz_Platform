@@ -113,6 +113,9 @@
     <div class="card">
         <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
         <a href="{{ url_for('leaderboard') }}">Leaderboard</a> |
+        {% if current_user.role == "admin" %}
+        <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+        {% endif %}
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 

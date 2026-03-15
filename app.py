@@ -253,7 +253,7 @@ def profile():
 @login_required
 def leaderboard():
 
-    users = User.query.all()
+    users = User.query.filter_by(role="student").all()
     leaderboard_data = []
 
     for user in users:
@@ -274,6 +274,43 @@ def leaderboard():
 
     return render_template("leaderboard.html", leaderboard=leaderboard_data)
 
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if current_user.role != "admin":
+        flash("Access denied: Admins only.")
+        return redirect(url_for('dashboard'))
+
+    users = User.query.filter_by(role="student").all()
+    attempts = QuizAttempt.query.all()
+
+    total_users = len(users)
+    total_attempts = len(attempts)
+
+    avg_engagement = 0
+    if attempts:
+        avg_engagement = round(
+            sum(a.engagement_boost for a in attempts) / total_attempts, 2
+        )
+
+    reward_counts = {
+        "Points": 0,
+        "Badge": 0,
+        "Progress Bar": 0,
+        "Leaderboard": 0
+    }
+
+    for a in attempts:
+        reward_counts[a.reward_type] += 1
+
+    return render_template(
+        "admin.html",
+        total_users=total_users,
+        total_attempts=total_attempts,
+        avg_engagement=avg_engagement,
+        reward_counts=reward_counts
+    )
+
 # Routes
 @app.route('/')
 def welcome():
@@ -282,6 +319,9 @@ def welcome():
 @app.route('/start')
 @login_required
 def dashboard():
+    if current_user.role == "admin":
+        return redirect(url_for('admin_dashboard'))
+
     return render_template('quiz.html')
 
 @app.route('/logout')
