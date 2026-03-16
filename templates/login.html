@@ -32,7 +32,7 @@
         }
 
         input {
-            width: 100%;
+            width: 90%;
             padding: 12px;
             margin: 10px 0;
             border-radius: 8px;
@@ -63,12 +63,36 @@
             color: #E9650E;
             font-weight: bold;
         }
+
+        .login-mascot {
+            position: fixed;
+            bottom: 5px;
+            left: 100px;
+            width: 380px;
+            opacity: 0.95;
+            z-index: 500;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="card">
-        <h2>Login</h2>
+        <h1>Login</h1>
         <form method="POST">
             <input name="username" placeholder="Username" required>
             <input name="password" type="password" placeholder="Password" required>
@@ -76,6 +100,7 @@
         </form>
         <a href="{{ url_for('register') }}">Don't have an account? Register</a>
     </div>
+    <img src="/static/images/login.png" class="login-mascot">
 </body>
 
 </html>

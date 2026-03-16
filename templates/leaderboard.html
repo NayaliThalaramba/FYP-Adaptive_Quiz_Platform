@@ -71,13 +71,37 @@
             color: #cd7f32;
             font-weight: bold;
         }
+
+        .leaderboard-mascot {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            width: 380px;
+            opacity: 0.95;
+            z-index: 500;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div class="card">
-        <h2>Leaderboard</h2>
+        <h1>Leaderboard</h1>
 
         <table>
             <tr>
@@ -111,7 +135,7 @@
         <a href="{{ url_for('profile') }}">My Profile</a> |
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
-
+    <img src="/static/images/leaderboardpage.png" class="leaderboard-mascot">
 </body>
 
 </html>

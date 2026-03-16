@@ -32,7 +32,7 @@
         }
 
         input {
-            width: 100%;
+            width: 90%;
             padding: 12px;
             margin: 10px 0;
             border-radius: 8px;
@@ -63,12 +63,36 @@
             color: #E9650E;
             font-weight: bold;
         }
+
+        .register-mascot {
+            position: fixed;
+            bottom: 5px;
+            right: 100px;
+            width: 380px;
+            opacity: 0.95;
+            z-index: 500;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="card">
-        <h2>Create Account</h2>
+        <h1>Create Account</h1>
         <form method="POST">
             <input name="first_name" placeholder="First Name" required>
             <input name="last_name" placeholder="Last Name" required>
@@ -79,6 +103,7 @@
         </form>
         <a href="{{ url_for('login') }}">Already have an account? Login</a>
     </div>
+    <img src="/static/images/login.png" class="register-mascot">
 </body>
 
 </html>

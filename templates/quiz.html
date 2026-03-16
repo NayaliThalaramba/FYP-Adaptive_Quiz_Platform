@@ -56,18 +56,20 @@
             border-radius: 15px;
             text-align: center;
             margin: 20px 0;
-            animation: pop 0.5s ease;
+            animation: pulse 1s ease;
         }
 
-        @keyframes pop {
+        @keyframes pulse {
             0% {
                 transform: scale(0.8);
-                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.1);
             }
 
             100% {
                 transform: scale(1);
-                opacity: 1;
             }
         }
 
@@ -184,8 +186,8 @@
         }
 
         .modal-content {
-            background: #fff;
-            color: #000;
+            background: #000;
+            color: #fff;
             margin: 15% auto;
             padding: 20px;
             border-radius: 15px;
@@ -197,6 +199,78 @@
             float: right;
             font-size: 25px;
             cursor: pointer;
+        }
+
+        #rewardOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0, 0, 0, 0.7);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            opacity: 0;
+            pointer-events: none;
+
+            transition: opacity 0.5s ease;
+
+            z-index: 2000;
+        }
+
+        #rewardOverlay img {
+            width: 500px;
+
+            transform: scale(0.5);
+            opacity: 0;
+
+            animation: rewardPop 0.6s forwards;
+        }
+
+        @keyframes rewardPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .instruction-mascot {
+            position: fixed;
+            bottom: 20px;
+            left: 40px;
+            width: 450px;
+            opacity: 0.95;
+            display: none;
+            z-index: 1500;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
     </style>
 </head>
@@ -261,7 +335,7 @@
 
             <span class="close" onclick="closeInstructions()">&times;</span>
 
-            <h3>Quiz Instructions</h3>
+            <h1>Quiz Instructions</h1>
 
             <ul style="text-align:left; line-height:1.6;">
                 <li>Adjust your quiz score using the slider.</li>
@@ -304,6 +378,28 @@
             document.getElementById('scoreValue').textContent = value + "%";
         }
 
+        function animateValue(id, start, end, duration) {
+
+            let range = end - start;
+            let startTime = null;
+
+            function step(timestamp) {
+
+                if (!startTime) startTime = timestamp;
+
+                let progress = timestamp - startTime;
+                let value = Math.min(start + range * (progress / duration), end);
+
+                document.getElementById(id).textContent = value.toFixed(2);
+
+                if (progress < duration) {
+                    requestAnimationFrame(step);
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+
         async function submitQuiz() {
             const score = parseInt(document.getElementById('score').value) / 100;
             const time = parseFloat(document.getElementById('time').value);
@@ -323,11 +419,12 @@
             document.getElementById('rewardDisplay').innerHTML = "Suggested Reward: " + result.reward;
             document.getElementById('rewardDisplay').className = 'reward-display success';
             document.getElementById('explanation').innerHTML = result.explanation;
-            document.getElementById('adaptiveScore').textContent = result.engagement_boost.toFixed(2);
-            document.getElementById('staticScore').textContent = result.static_score.toFixed(2);
+            animateValue("adaptiveScore", 0, result.engagement_boost, 800);
+            animateValue("staticScore", 0, result.static_score, 800);
             document.getElementById('confidenceScore').textContent = result.confidence;
 
             document.getElementById('rewardSection').style.display = 'block';
+            showRewardPopup(result.reward);
             document.getElementById('dashboard').style.display = 'block';
 
             // Store local history (for chart only)
@@ -378,13 +475,52 @@
 
         function openInstructions() {
             document.getElementById("instructionModal").style.display = "block";
+            document.getElementById("instructionMascot").style.display = "block";
         }
 
         function closeInstructions() {
             document.getElementById("instructionModal").style.display = "none";
+            document.getElementById("instructionMascot").style.display = "none";
+        }
+
+        function showRewardPopup(reward) {
+
+            let image = "";
+
+            if (reward.includes("Points")) {
+                image = "/static/images/points.png";
+            }
+
+            else if (reward.includes("Badge")) {
+                image = "/static/images/badge.png";
+            }
+
+            else if (reward.includes("Leaderboard")) {
+                image = "/static/images/leaderboard.png";
+            }
+
+            else if (reward.includes("Progress")) {
+                image = "/static/images/progressbar.png";
+            }
+
+            const overlay = document.getElementById("rewardOverlay");
+            const img = document.getElementById("rewardAnimationImage");
+
+            img.src = image;
+
+            overlay.style.opacity = "1";
+
+            setTimeout(() => {
+                overlay.style.opacity = "0";
+            }, 2000);
         }
     </script>
+    <div id="rewardOverlay">
 
+        <img id="rewardAnimationImage" src="">
+
+    </div>
+    <img id="instructionMascot" src="/static/images/info.png" class="instruction-mascot">
 </body>
 
 </html>

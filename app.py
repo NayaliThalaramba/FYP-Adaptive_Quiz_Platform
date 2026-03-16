@@ -312,6 +312,31 @@ def leaderboard():
 
     return render_template("leaderboard.html", leaderboard=leaderboard_data)
 
+@app.route("/progress")
+@login_required
+def progress():
+
+    attempts = QuizAttempt.query.filter_by(
+        user_id=current_user.id
+    ).all()
+
+    attempts_count = len(attempts)
+
+    total_engagement = sum(a.engagement_boost for a in attempts)
+
+    progress_percent = min(attempts_count * 10, 100)
+
+    # simple streak logic
+    streak = attempts_count
+
+    return render_template(
+        "progress.html",
+        attempts=attempts_count,
+        engagement=round(total_engagement, 2),
+        progress=progress_percent,
+        streak=streak
+    )
+
 @app.route('/admin')
 @login_required
 def admin_dashboard():

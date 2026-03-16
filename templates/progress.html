@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Learning Progress</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background: url("/static/images/background.jpg");
+            background-size: cover;
+            color: white;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.75);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background: #333;
+            border-radius: 20px;
+        }
+
+        .progress-fill {
+            height: 25px;
+            background: #FFD700;
+            border-radius: 20px;
+            width: var(--progress);
+            text-align: center;
+            line-height: 25px;
+            color: black;
+            font-weight: bold;
+            transition: width 0.8s ease;
+        }
+
+        .metric {
+            font-size: 1.5em;
+            margin: 10px;
+        }
+
+        a {
+            color: #FFD700;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 style="color: #000;">Learning Progress</h1>
+
+    <div class="card">
+
+        <div class="metric">
+            Current Streak: <b>{{ streak }}</b> days
+        </div>
+
+        <div class="metric">
+            Quizzes Completed: <b>{{ attempts }}</b>
+        </div>
+
+        <div class="metric">
+            Total Engagement: <b>{{ engagement }}</b>
+        </div>
+
+        <br>
+
+        <h3>Course Progress</h3>
+
+        <div class="progress-bar">
+            <div class="progress-fill" style="--progress: {{ progress }}%;">
+                {{ progress }}%
+            </div>
+        </div>
+        <p>{{progress}}% completed</p>
+
+        <br>
+
+        <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
+        <a href="{{ url_for('profile') }}">My Profile</a> |
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+    </div>
+
+</body>
+
+</html>
