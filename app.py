@@ -61,9 +61,36 @@ except FileNotFoundError:
         np.where(train_data['score'] >= 0.75, 1,
                  np.where(train_data['score'] >= 0.6, 2, 0)))
 
+print("Loading Duolingo behavioural features...")
+try:
+    duolingo_data = pd.read_csv('data/duolingo_features.csv')
+    print(f"Loaded Duolingo features: {len(duolingo_data)} samples")
+except FileNotFoundError:
+    print("Duolingo data missing, using synthetic fallback")
+    duolingo_data = pd.DataFrame({
+        'practice_accuracy': np.random.uniform(0.5, 0.9, 1000),
+        'practice_frequency': np.random.uniform(0.2, 1.0, 1000),
+        'recency': np.random.uniform(0.0, 1.0, 1000)
+    })
+
 print(f"Training RandomForest ({len(train_data)} samples)...")
-X = train_data[['score', 'time_spent', 'prev_engagement', 'motivation']]
+duolingo_sample = duolingo_data.sample(len(train_data), replace=True)
+
+train_data["practice_accuracy"] = duolingo_sample["practice_accuracy"].values
+train_data["practice_frequency"] = duolingo_sample["practice_frequency"].values
+train_data["recency"] = duolingo_sample["recency"].values
+
+X = train_data[[
+    'score',
+    'time_spent',
+    'prev_engagement',
+    'practice_accuracy',
+    'practice_frequency',
+    'recency'
+]]
+
 y = train_data['optimal_reward']
+
 model = RandomForestClassifier(n_estimators=120, random_state=42)
 model.fit(X, y)
 accuracy = model.score(X, y)
@@ -121,10 +148,21 @@ def take_quiz():
         avg_confidence = np.mean(recent_scores)
 
     # ML Prediction
-    motivation = current_user.id
     prev_engagement = avg_confidence
 
-    features = np.array([[score, time_spent, prev_engagement, motivation]])
+    practice_accuracy = score
+    practice_frequency = min(1.0, len(attempts) / 10)
+    recency = 1.0 if not attempts else 0.5
+
+    features = np.array([[
+        score,
+        time_spent,
+        prev_engagement,
+        practice_accuracy,
+        practice_frequency,
+        recency
+    ]], dtype=float)
+
     ml_probs = model.predict_proba(features)[0]
     confidence = round(float(np.max(ml_probs)), 2)
 
