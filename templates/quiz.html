@@ -130,8 +130,28 @@
             display: flex;
             gap: 130px;
             justify-content: center;
+            align-items: flex-start;
             margin: 20px 0;
             flex-wrap: wrap;
+        }
+
+        .control-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 260px;
+        }
+
+        .control-label {
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .score-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .ml-badge {
@@ -248,6 +268,38 @@
             }
         }
 
+        .instructions-btn {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions-btn:hover {
+            background: #FF5252;
+            transform: translateY(-2px);
+        }
+
+        .info-icon {
+            width: 22px;
+            height: 22px;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
         .instruction-mascot {
             position: fixed;
             bottom: 20px;
@@ -272,6 +324,76 @@
                 transform: translateY(0px);
             }
         }
+
+        .technical-btn {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .technical-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 260px;
+            height: 8px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #FF6B6B 0%, #FF6B6B 75%, #ffffff 75%, #ffffff 100%);
+            outline: none;
+            margin: 10px 0;
+            padding: 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #FFD700;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #FFD700;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        input[type="range"]::-moz-range-track {
+            height: 8px;
+            border-radius: 10px;
+            background: transparent;
+        }
+
+        .question-icon {
+            width: 18px;
+            height: 18px;
+            border: 1.8px solid white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1;
+            margin-right: 8px;
+        }
     </style>
 </head>
 
@@ -289,20 +411,23 @@
 
     <div class="quiz-card">
         <div style="text-align:right; margin-bottom:10px;">
-            <button onclick="openInstructions()">Instructions</button>
+            <button class="instructions-btn" onclick="openInstructions()">
+                <span class="info-icon">i</span>
+                Instructions
+            </button>
         </div>
         <div class="controls">
-            <div>
-                <label>Quiz Score:
+            <div class="control-box">
+                <label class="control-label">Quiz Score</label>
+                <div class="score-control">
                     <input type="range" id="score" min="0" max="100" value="75" oninput="updateScore(this.value)">
                     <span id="scoreValue">75%</span>
-                </label>
+                </div>
             </div>
 
-            <div>
-                <label>Time (min):
-                    <input type="number" id="time" value="20" min="1" max="60">
-                </label>
+            <div class="control-box">
+                <label class="control-label">Time (min)</label>
+                <input type="number" id="time" value="20" min="1" max="60">
             </div>
         </div>
 
@@ -313,13 +438,14 @@
             <div id="explanation"
                 style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin: 10px 0;">
             </div>
-            <div id="technicalExplainWrapper" style="display:none; margin: 12px 0;">
-                <button id="toggleTechnicalBtn" onclick="toggleTechnicalDetails()">
-                    Show advanced AI explanation
+            <div id="technicalExplainWrapper" style="display:none; margin: 12px 0; text-align:right;">
+                <button id="toggleTechnicalBtn" class="technical-btn" onclick="toggleTechnicalDetails()">
+                    <span class="question-icon">?</span>
+                    Show technical AI details
                 </button>
 
                 <div id="shapSection"
-                    style="background: rgba(255,255,255,0.08); padding: 15px; border-radius: 10px; margin: 12px 0 0 0; display:none;">
+                    style="background: rgba(255,255,255,0.08); padding: 15px; border-radius: 10px; margin: 12px 0 0 0; display:none; text-align: center;">
                     <h4 style="margin-top:0;">Technical AI details</h4>
                     <p style="opacity:0.85; font-size:14px; margin-top:0;">
                         These values show which behavioural factors were most influential in the explainable AI
@@ -362,7 +488,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboard" class="quiz-card" style="display:none;">
         <h3>Engagement Analytics</h3>
         <p style="opacity:0.85;">
@@ -391,6 +516,10 @@
 
         function updateScore(value) {
             document.getElementById('scoreValue').textContent = value + "%";
+
+            const slider = document.getElementById('score');
+            slider.style.background =
+                `linear-gradient(to right, #FF6B6B 0%, #FF6B6B ${value}%, #ffffff ${value}%, #ffffff 100%)`;
         }
 
         function toggleTechnicalDetails() {
@@ -399,10 +528,10 @@
 
             if (shapSection.style.display === 'none' || shapSection.style.display === '') {
                 shapSection.style.display = 'block';
-                btn.textContent = 'Hide technical AI details';
+                btn.innerHTML = '<span class="question-icon">?</span> Hide technical AI details';
             } else {
                 shapSection.style.display = 'none';
-                btn.textContent = 'Show technical AI details';
+                btn.innerHTML = '<span class="question-icon">?</span> Show technical AI details';
             }
         }
 
@@ -443,7 +572,6 @@
 
             const result = await response.json();
 
-            // Show reward section
             document.getElementById('rewardDisplay').innerHTML = "Suggested Reward: " + result.reward;
             document.getElementById('rewardDisplay').className = 'reward-display success';
             document.getElementById('explanation').innerHTML = result.explanation;
@@ -459,7 +587,7 @@
                 shapDiv.innerHTML = "";
                 shapSection.style.display = "none";
                 shapWrapper.style.display = "block";
-                toggleBtn.textContent = "Show technical AI details";
+                toggleBtn.innerHTML = '<span class="question-icon">?</span> Show technical AI details';
 
                 Object.entries(result.shap).forEach(([feature, value]) => {
                     const line = document.createElement("div");
@@ -478,7 +606,6 @@
             showRewardPopup(result.reward);
             document.getElementById('dashboard').style.display = 'block';
 
-            // Store local history (for chart only)
             history.push({
                 score: score,
                 adaptive: result.engagement_boost
@@ -565,6 +692,7 @@
                 overlay.style.opacity = "0";
             }, 2000);
         }
+        updateScore(document.getElementById('score').value);
     </script>
     <div id="rewardOverlay">
 
