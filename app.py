@@ -8,7 +8,8 @@ import numpy as np
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
+import shap
 
 app = Flask(__name__)
 MAX_QUESTIONS = 20
@@ -25,7 +26,7 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 PPO_MODEL_PATH = "ppo_quiz_final"
 
@@ -97,6 +98,7 @@ model.fit(X, y)
 accuracy = model.score(X, y)
 print(f"OULAD Production Model: {accuracy:.1%} accuracy | {len(train_data)} samples")
 reward_types = ['Points', 'Badge', 'Progress Bar', 'Leaderboard']
+explainer = shap.TreeExplainer(model)
 
 
 # XAI
@@ -155,17 +157,28 @@ def take_quiz():
     practice_frequency = min(1.0, len(attempts) / 10)
     recency = 1.0 if not attempts else 0.5
 
-    features = np.array([[
-        score,
-        time_spent,
-        prev_engagement,
-        practice_accuracy,
-        practice_frequency,
-        recency
-    ]], dtype=float)
+    feature_names = [
+        'score',
+        'time_spent',
+        'prev_engagement',
+        'practice_accuracy',
+        'practice_frequency',
+        'recency'
+    ]
 
-    ml_probs = model.predict_proba(features)[0]
+    features_df = pd.DataFrame([{
+        'score': score,
+        'time_spent': time_spent,
+        'prev_engagement': prev_engagement,
+        'practice_accuracy': practice_accuracy,
+        'practice_frequency': practice_frequency,
+        'recency': recency
+    }])
+
+    ml_probs = model.predict_proba(features_df)[0]
     confidence = round(float(np.max(ml_probs)), 2)
+    ml_class_pos = int(np.argmax(ml_probs))
+    ml_class_label = int(model.classes_[ml_class_pos])
 
     # PPO State
     obs = np.array([
@@ -189,11 +202,45 @@ def take_quiz():
     else:
         action, _ = ppa_model.predict(obs, deterministic=True)
         reward_idx = int(action[0])
+    
+    shap_raw = explainer.shap_values(features_df)
+
+    if isinstance(shap_raw, list):
+        # old-style SHAP output: list per class
+        class_shap = shap_raw[ml_class_pos][0]
+    else:
+        shap_arr = np.array(shap_raw)
+
+        if shap_arr.ndim == 3:
+            # common shape for tree models: (samples, features, classes)
+            if shap_arr.shape[0] == 1 and shap_arr.shape[2] == len(model.classes_):
+                class_shap = shap_arr[0, :, ml_class_pos]
+            # alternative shape: (classes, samples, features)
+            elif shap_arr.shape[0] == len(model.classes_):
+                class_shap = shap_arr[ml_class_pos, 0, :]
+            else:
+                class_shap = np.zeros(len(feature_names))
+        elif shap_arr.ndim == 2:
+            class_shap = shap_arr[0]
+        else:
+            class_shap = np.zeros(len(feature_names))
+
+    shap_explanation = {
+        feature_names[i]: round(float(class_shap[i]), 3)
+        for i in range(len(feature_names))
+    }
+
+    top_shap = dict(
+        sorted(
+            shap_explanation.items(),
+            key=lambda item: abs(item[1]),
+            reverse=True
+        )[:3]
+    )
 
     reward_name = reward_types[reward_idx]
     engagement_boost = round(score * 1.3, 2)
 
-    # Store in DB
     new_attempt = QuizAttempt(
         score=score,
         time_spent=time_spent,
@@ -205,13 +252,16 @@ def take_quiz():
     db.session.add(new_attempt)
     db.session.commit()
 
+    print("SHAP TOP FEATURES:", top_shap)
+
     return jsonify({
         'reward': reward_name,
         'explanation': explain_reward(reward_name, score, confidence),
         'engagement_boost': engagement_boost,
         'static_score': score,
         'confidence': confidence,
-        'history_length': questions_seen + 1
+        'history_length': questions_seen + 1,
+        'shap': top_shap
     })
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -334,7 +384,7 @@ def progress():
     )
 
     streak = 0
-    today = datetime.utcnow().date()
+    today = datetime.now(UTC).date()
 
     for i, d in enumerate(attempt_dates):
         expected_day = today - timedelta(days=i)
