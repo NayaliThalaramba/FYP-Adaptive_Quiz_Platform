@@ -1,11 +1,10 @@
-from flask import redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, QuizAttempt
 from stable_baselines3 import PPO
 from src.quiz_env import QuizEnv
 import numpy as np
-from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from datetime import datetime, timedelta, UTC
@@ -267,17 +266,43 @@ def take_quiz():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        email = request.form['email']
-        username = request.form['username']
+        first_name = request.form['first_name'].strip()
+        last_name = request.form['last_name'].strip()
+        email = request.form['email'].strip().lower()
+        username = request.form['username'].strip()
+        if any(char.isspace() for char in username):
+            flash("Username cannot contain spaces.", "error")
+            return render_template('register.html')
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        if len(first_name) < 2:
+            flash("First name must be at least 2 characters long.", "error")
+            return render_template('register.html')
+
+        if len(last_name) < 2:
+            flash("Last name must be at least 2 characters long.", "error")
+            return render_template('register.html')
+
+        if len(username) < 4:
+            flash("Username must be at least 4 characters long.", "error")
+            return render_template('register.html')
+
+        if len(password) < 6:
+            flash("Password must be at least 6 characters long.", "error")
+            return render_template('register.html')
+
+        if password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return render_template('register.html')
 
         if User.query.filter_by(username=username).first():
-            return "Username already exists"
+            flash("Username already exists.", "error")
+            return render_template('register.html')
 
         if User.query.filter_by(email=email).first():
-            return "Email already registered"
+            flash("Email already registered.", "error")
+            return render_template('register.html')
 
         hashed_pw = generate_password_hash(password)
 
@@ -292,6 +317,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        flash("Registration successful. Please log in.", "success")
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -299,7 +325,10 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].strip()
+        if any(char.isspace() for char in username):
+            flash("Username cannot contain spaces.", "error")
+            return render_template('login.html')
         password = request.form['password']
 
         user = User.query.filter_by(username=username).first()
@@ -308,7 +337,8 @@ def login():
             login_user(user)
             return redirect(url_for('dashboard'))
 
-        return "Invalid credentials"
+        flash("Invalid credentials. Please try again.", "error")
+        return render_template('login.html')
 
     return render_template('login.html')
 
