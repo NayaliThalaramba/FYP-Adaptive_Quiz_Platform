@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -25,5 +26,6 @@ class QuizAttempt(db.Model):
     time_spent = db.Column(db.Float, nullable=False)
     engagement_boost = db.Column(db.Float, nullable=False)
     reward_type = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

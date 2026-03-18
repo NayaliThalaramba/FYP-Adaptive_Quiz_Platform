@@ -8,6 +8,7 @@ import numpy as np
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 MAX_QUESTIONS = 20
@@ -326,8 +327,22 @@ def progress():
 
     progress_percent = min(attempts_count * 10, 100)
 
-    # simple streak logic
-    streak = attempts_count
+    # -------- REAL DAILY STREAK --------
+    attempt_dates = sorted(
+        {a.created_at.date() for a in attempts},
+        reverse=True
+    )
+
+    streak = 0
+    today = datetime.utcnow().date()
+
+    for i, d in enumerate(attempt_dates):
+        expected_day = today - timedelta(days=i)
+
+        if d == expected_day:
+            streak += 1
+        else:
+            break
 
     return render_template(
         "progress.html",
@@ -366,12 +381,27 @@ def admin_dashboard():
     for a in attempts:
         reward_counts[a.reward_type] += 1
 
+    engagement_by_day = {}
+
+    for a in attempts:
+        day = a.created_at.strftime("%Y-%m-%d")
+
+        if day not in engagement_by_day:
+            engagement_by_day[day] = 0
+
+        engagement_by_day[day] = round(
+            engagement_by_day.get(day, 0) + a.engagement_boost, 2
+        )
+
+    engagement_by_day = dict(sorted(engagement_by_day.items()))
+
     return render_template(
         "admin.html",
         total_users=total_users,
         total_attempts=total_attempts,
         avg_engagement=avg_engagement,
-        reward_counts=reward_counts
+        reward_counts=reward_counts,
+        engagement_trend=engagement_by_day  
     )
 
 # Routes

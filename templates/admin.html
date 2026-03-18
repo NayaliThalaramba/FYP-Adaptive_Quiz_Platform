@@ -72,6 +72,10 @@
         <h3>Reward Distribution</h3>
         <div id="rewardChart"></div>
     </div>
+    <div class="card">
+        <h3>Engagement Trend</h3>
+        <div id="engagementChart"></div>
+    </div>
 
     <a href="{{ url_for('logout') }}" style="color: #fff;">Logout</a>
 
@@ -88,6 +92,28 @@
 
         Plotly.newPlot('rewardChart', data, {
             title: 'Gamification Reward Distribution'
+        });
+
+        const engagementTrend = JSON.parse('{{ engagement_trend | tojson | safe }}');
+
+        const trendData = [{
+            x: Object.keys(engagementTrend),
+            y: Object.values(engagementTrend),
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { shape: 'spline' }   // smooth curve
+        }];
+
+        Plotly.newPlot('engagementChart', trendData, {
+            title: 'Student Engagement Over Time',
+            xaxis: {
+                title: 'Date',
+                type: 'category'   // 🔥 THIS FIXES YOUR ISSUE
+            },
+            yaxis: {
+                title: 'Total Engagement',
+                tickformat: ".2f"  // 🔥 rounds axis nicely
+            }
         });
 
     </script>
