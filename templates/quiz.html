@@ -662,36 +662,34 @@
         }
 
         function showRewardPopup(reward) {
-
             let image = "";
 
             if (reward.includes("Points")) {
                 image = "/static/images/points.png";
-            }
-
-            else if (reward.includes("Badge")) {
+            } else if (reward.includes("Badge")) {
                 image = "/static/images/badge.png";
-            }
-
-            else if (reward.includes("Leaderboard")) {
+            } else if (reward.includes("Leaderboard")) {
                 image = "/static/images/leaderboard.png";
-            }
-
-            else if (reward.includes("Progress")) {
+            } else if (reward.includes("Progress")) {
                 image = "/static/images/progressbar.png";
             }
 
             const overlay = document.getElementById("rewardOverlay");
             const img = document.getElementById("rewardAnimationImage");
 
-            img.src = image;
-
-            overlay.style.opacity = "1";
+            overlay.style.opacity = "0";
+            img.src = "";
 
             setTimeout(() => {
-                overlay.style.opacity = "0";
-            }, 2000);
+                img.src = image;
+                overlay.style.opacity = "1";
+
+                setTimeout(() => {
+                    overlay.style.opacity = "0";
+                }, 2000);
+            }, 50);
         }
+
         updateScore(document.getElementById('score').value);
     </script>
     <div id="rewardOverlay">

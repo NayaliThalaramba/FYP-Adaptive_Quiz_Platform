@@ -506,5 +506,19 @@ def logout():
 with app.app_context():
     db.create_all()
 
+    admin_user = User.query.filter_by(username="admin").first()
+    if not admin_user:
+        admin_user = User(
+            first_name="System",
+            last_name="Admin",
+            email="admin@adaptivequiz.com",
+            username="admin",
+            password=generate_password_hash("Admin123!"),
+            role="admin"
+        )
+        db.session.add(admin_user)
+        db.session.commit()
+        print("Default admin user created.")
+        
 if __name__ == '__main__':
     app.run(debug=True)
