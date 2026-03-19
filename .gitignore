@@ -1,7 +1,9 @@
 # Large data files
 data/*.csv
+!data/duolingo_features.csv
 *.zip
 ppo_quiz*.zip
+!ppo_quiz_final.zip
 __pycache__/
 *.pyc
 student_history.json
