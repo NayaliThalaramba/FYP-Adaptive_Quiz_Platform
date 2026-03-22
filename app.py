@@ -464,6 +464,9 @@ def logout():
 with app.app_context():
     db.create_all()
 
+    print("Database driver:", db.engine.url.drivername)
+    print("Database URL:", db.engine.url)
+
     admin_user = User.query.filter_by(username="admin").first()
     if not admin_user:
         admin_user = User(
