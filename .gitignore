@@ -13,3 +13,5 @@ env/
 instance/
 users.db
 *.backup
+
+venv311/
