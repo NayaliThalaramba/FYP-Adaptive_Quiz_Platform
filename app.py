@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import os
 import joblib
-import shap
+import matplotlib
+matplotlib.use('Agg')
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -55,7 +56,6 @@ model = joblib.load("rf_model.pkl")
 print("RandomForest model loaded successfully.")
 
 reward_types = ['Points', 'Badge', 'Progress Bar', 'Leaderboard']
-explainer = shap.TreeExplainer(model)
 
 
 # XAI
@@ -159,41 +159,6 @@ def take_quiz():
     else:
         action, _ = ppa_model.predict(obs, deterministic=True)
         reward_idx = int(action[0])
-    
-    shap_raw = explainer.shap_values(features_df)
-
-    if isinstance(shap_raw, list):
-        # old-style SHAP output: list per class
-        class_shap = shap_raw[ml_class_pos][0]
-    else:
-        shap_arr = np.array(shap_raw)
-
-        if shap_arr.ndim == 3:
-            # common shape for tree models: (samples, features, classes)
-            if shap_arr.shape[0] == 1 and shap_arr.shape[2] == len(model.classes_):
-                class_shap = shap_arr[0, :, ml_class_pos]
-            # alternative shape: (classes, samples, features)
-            elif shap_arr.shape[0] == len(model.classes_):
-                class_shap = shap_arr[ml_class_pos, 0, :]
-            else:
-                class_shap = np.zeros(len(feature_names))
-        elif shap_arr.ndim == 2:
-            class_shap = shap_arr[0]
-        else:
-            class_shap = np.zeros(len(feature_names))
-
-    shap_explanation = {
-        feature_names[i]: round(float(class_shap[i]), 3)
-        for i in range(len(feature_names))
-    }
-
-    top_shap = dict(
-        sorted(
-            shap_explanation.items(),
-            key=lambda item: abs(item[1]),
-            reverse=True
-        )[:3]
-    )
 
     reward_name = reward_types[reward_idx]
     engagement_boost = round(score * 1.3, 2)
@@ -209,7 +174,11 @@ def take_quiz():
     db.session.add(new_attempt)
     db.session.commit()
 
-    print("SHAP TOP FEATURES:", top_shap)
+    top_features = {
+        "score": round(score, 2),
+        "engagement": round(prev_engagement, 2),
+        "frequency": round(practice_frequency, 2)
+    }
 
     return jsonify({
         'reward': reward_name,
@@ -218,7 +187,7 @@ def take_quiz():
         'static_score': score,
         'confidence': confidence,
         'history_length': questions_seen + 1,
-        'shap': top_shap
+        'features_used' :top_features
     })
 
 @app.route('/register', methods=['GET', 'POST'])
