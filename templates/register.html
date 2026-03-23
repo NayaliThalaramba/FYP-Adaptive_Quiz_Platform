@@ -4,143 +4,195 @@
 <head>
     <title>Register | Adaptive Learning</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre&display=swap" rel="stylesheet">
+
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            height: 100vh;
+            font-family: "Averia Sans Libre", sans-serif;
+            min-height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            background:
-                linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-                url("/static/images/Welcome.jpeg");
-            background-size: cover;
-            background-position: center;
+            background: #F5F7F6;
+            overflow: hidden;
+            position: relative;
         }
 
         .card {
             background: white;
-            padding: 40px;
-            width: 350px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            padding: 35px;
+            width: 380px;
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
             text-align: center;
+            z-index: 2;
+            position: relative;
         }
 
-        h2 {
-            margin-bottom: 25px;
+        .register-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            margin-bottom: -50px;
+        }
+
+        .register-video-inside {
+            width: 90px;
+            height: 250px;
+            object-fit: contain;
+            flex-shrink: 0;
+            margin-left: -42px;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 2.7em;
+            margin: 0;
+            color: #E9650E;
         }
 
         input {
             width: 90%;
             padding: 12px;
             margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            border-radius: 10px;
+            border: 1px solid #cfeaea;
+            font-size: 15px;
+            background: #fff;
+            color: #222;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #249EA0;
+            box-shadow: 0 0 0 2px rgba(36, 158, 160, 0.12);
         }
 
         button {
-            width: 100%;
+            width: 90%;
             padding: 12px;
-            margin-top: 15px;
+            margin-top: 18px;
             border: none;
             border-radius: 25px;
-            background: #E9650E;
+            background: #249EA0;
             color: white;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 16px;
             cursor: pointer;
             transition: 0.3s;
+            border-bottom: 5px solid #005F60;
         }
 
         button:hover {
-            background: #FEA719;
+            background: #35b4b6;
+            transform: translateY(-2px);
+            border-bottom: 5px solid #0b5152;
         }
 
         a {
             display: block;
-            margin-top: 15px;
+            margin-top: 18px;
             text-decoration: none;
             color: #E9650E;
-            font-weight: bold;
+            font-size: 15px;
+            font-weight: 600;
         }
 
-        .register-mascot {
-            position: fixed;
-            bottom: 5px;
-            right: 100px;
-            width: 380px;
-            opacity: 0.95;
-            z-index: 500;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-
-            100% {
-                transform: translateY(0px);
-            }
+        a:hover {
+            text-decoration: underline;
+            color: #249EA0;
         }
 
         .flash-message {
             width: 90%;
-            margin: 0 auto 15px auto;
-            padding: 12px;
+            margin: 0 auto 12px auto;
+            padding: 10px;
             border-radius: 10px;
             font-size: 14px;
-            font-weight: 600;
         }
 
         .flash-message.error {
             background: #ffe0e0;
             color: #b30000;
-            border: 1px solid #ffb3b3;
         }
 
         .flash-message.success {
-            background: #e6ffe6;
-            color: #0f7a0f;
-            border: 1px solid #a8e6a8;
+            background: #e6fff7;
+            color: #0a6c5d;
         }
 
         .password-wrapper {
             position: relative;
-            width: 100%;
             display: flex;
             justify-content: center;
         }
 
         .password-wrapper input {
             width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
             padding-right: 42px;
         }
 
         .toggle-password {
             position: absolute;
-            right: 28px;
+            right: 30px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 18px;
-            user-select: none;
+            color: #777;
+        }
+
+        .toggle-password:hover {
+            color: #249EA0;
+        }
+
+        .bottom-wave {
+            position: fixed;
+            bottom: -40px;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                width: 340px;
+                padding: 25px;
+            }
+
+            .register-video {
+                width: 150px;
+                height: 120px;
+                left: 12px;
+                bottom: 20px;
+            }
+
+            .register-video-inside {
+                width: 70px;
+                height: 90px;
+            }
         }
     </style>
 </head>
 
 <body>
+
     <div class="card">
-        <h1>Create Account</h1>
+        <div class="register-header">
+            <video class="register-video-inside" autoplay muted loop playsinline>
+                <source src="/static/videos/register-2.mp4" type="video/mp4">
+            </video>
+
+            <h1>Create Account</h1>
+        </div>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -148,11 +200,13 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
+
         <form method="POST">
             <input name="first_name" placeholder="First Name" required>
             <input name="last_name" placeholder="Last Name" required>
             <input name="email" type="email" placeholder="Email" required>
             <input name="username" placeholder="Username" required>
+
             <div class="password-wrapper">
                 <input id="registerPassword" name="password" type="password" placeholder="Password" required>
                 <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('registerPassword', this)"></i>
@@ -163,26 +217,37 @@
                     required>
                 <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('confirmPassword', this)"></i>
             </div>
+
             <button type="submit">Register</button>
         </form>
+
         <a href="{{ url_for('login') }}">Already have an account? Login</a>
     </div>
-    <img src="/static/images/login.png" class="register-mascot">
-</body>
-<script>
-    function togglePassword(inputId, icon) {
-        const input = document.getElementById(inputId);
 
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove("fa-eye");
-            icon.classList.add("fa-eye-slash");
-        } else {
-            input.type = "password";
-            icon.classList.remove("fa-eye-slash");
-            icon.classList.add("fa-eye");
+    <div class="bottom-wave">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#E9650E"
+                d="M0,192C120,150,240,130,360,154.7C480,181,600,256,720,261.3C840,267,960,203,1080,176C1200,149,1320,160,1440,192L1440,320L0,320Z">
+            </path>
+        </svg>
+    </div>
+
+    <script>
+        function togglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.replace("fa-eye-slash", "fa-eye");
+            }
         }
-    }
-</script>
+        const insideVideo = document.querySelector(".register-video-inside");
+        insideVideo.playbackRate = 0.3;
+    </script>
+
+</body>
 
 </html>

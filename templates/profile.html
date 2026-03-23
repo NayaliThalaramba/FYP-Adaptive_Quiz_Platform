@@ -2,126 +2,277 @@
 <html>
 
 <head>
-    <title>Profile</title>
+    <title>Profile | Adaptive Learning</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: "Averia Sans Libre", sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: #F5F7F6;
+            color: #222;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 20px 120px;
+            box-sizing: border-box;
+        }
+
+        .page-container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            background:
-                url("/static/images/background.jpg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: white;
-            text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
         .card {
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            background: white;
             padding: 30px;
             margin: 20px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .profile-header-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 60px;
+        }
+
+        .profile-video {
+            width: 180px;
+            height: 230px;
+            object-fit: cover;
+            border-radius: 50% / 35%;
+            flex-shrink: 0;
+            background: #f3fbfb;
+            border: 2px solid #cfeaea;
+        }
+
+        .profile-info {
+            flex: 1;
+            text-align: center;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #E9650E;
+            margin-top: 0;
         }
 
         h2 {
-            font-size: 2em;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .email-text {
+            color: #249EA0;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         .stats {
             display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 25px;
         }
 
         .stat {
+            background: #f3fbfb;
+            border: 1px solid #cfeaea;
+            border-radius: 18px;
+            padding: 20px 30px;
+            min-width: 180px;
             text-align: center;
+        }
+
+        .stat-label {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 8px;
         }
 
         .stat-value {
             font-size: 2em;
             font-weight: bold;
-            color: #FFD700;
+            color: #249EA0;
         }
 
         ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         li {
-            background: rgba(255, 255, 255, 0.1);
-            margin: 8px 0;
-            padding: 10px;
-            border-radius: 10px;
+            background: #f3fbfb;
+            margin: 10px 0;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid #cfeaea;
+            color: #222;
+            text-align: left;
         }
 
         a {
-            color: #FFD700;
             text-decoration: none;
+            color: #E9650E;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 0 8px;
         }
 
         a:hover {
             text-decoration: underline;
+            color: #249EA0;
+        }
+
+        .nav-links {
+            line-height: 2;
+        }
+
+        #profileChart {
+            height: 400px;
+            width: 100%;
+        }
+
+        .bottom-wave {
+            position: fixed;
+            bottom: -40px;
+            left: 0;
+            width: 100%;
+            height: 220px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bottom-wave svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 22px;
+            }
+
+            .profile-header-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px 22px;
+            }
+
+            .profile-info {
+                width: 100%;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+
+            h2 {
+                font-size: 1.8em;
+            }
+
+            .stat {
+                width: 80%;
+            }
+
+            .profile-video {
+                width: 150px;
+                height: 200px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="card">
-        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
-        <p>{{ user.email }}</p>
+    <div class="page-container">
+        <div class="card profile-header-card">
+            <video class="profile-video" autoplay muted loop playsinline>
+                <source src="/static/videos/profile.mp4" type="video/mp4">
+            </video>
 
-        <div class="stats">
-            <div class="stat">
-                <div>Total Attempts</div>
-                <div class="stat-value">{{ total_attempts }}</div>
-            </div>
+            <div class="profile-info">
+                <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+                <p class="email-text">{{ user.email }}</p>
 
-            <div class="stat">
-                <div>Average Score</div>
-                <div class="stat-value">{{ avg_score }}</div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-label">Total Attempts</div>
+                        <div class="stat-value">{{ total_attempts }}</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-label">Average Score</div>
+                        <div class="stat-value">{{ avg_score }}</div>
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <div class="card">
+            <h3>Performance Analytics</h3>
+            <p style="opacity:0.85;">
+                This chart tracks your quiz performance and engagement growth across attempts.
+                It helps visualize how adaptive rewards influence learning motivation and performance over time.
+                This shows the entire user history.
+            </p>
+            <div id="profileChart"></div>
+        </div>
+
+        <div class="card">
+            <h3>Recent Attempts</h3>
+            <ul>
+                {% for a in attempts %}
+                <li>
+                    Score: {{ a.score }} |
+                    Reward: {{ a.reward_type }} |
+                    Engagement: {{ a.engagement_boost }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card nav-links">
+            <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
+            <a href="{{ url_for('leaderboard') }}">Leaderboard</a> |
+            {% if current_user.role == "admin" %}
+            <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a> |
+            {% endif %}
+            <a href="{{ url_for('progress') }}">My Progress</a> |
+            <a href="{{ url_for('logout') }}">Logout</a>
         </div>
     </div>
 
-    <div class="card">
-        <h3>Performance Analytics</h3>
-        <p style="opacity:0.85;">
-            This chart tracks your quiz performance and engagement growth across attempts.
-            It helps visualize how adaptive rewards influence learning motivation and performance over time.
-            This shows the entire user history.
-        </p>
-        <div id="profileChart" style="height:400px;"></div>
-    </div>
-
-    <div class="card">
-        <h3>Recent Attempts</h3>
-        <ul>
-            {% for a in attempts %}
-            <li>
-                Score: {{ a.score }} |
-                Reward: {{ a.reward_type }} |
-                Engagement: {{ a.engagement_boost }}
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="card">
-        <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
-        <a href="{{ url_for('leaderboard') }}">Leaderboard</a> |
-        {% if current_user.role == "admin" %}
-        <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
-        {% endif %}
-        <a href="{{ url_for('progress') }}">My Progress</a> |
-        <a href="{{ url_for('logout') }}">Logout</a>
+    <div class="bottom-wave">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#E9650E"
+                d="M0,192C120,150,240,130,360,154.7C480,181,600,256,720,261.3C840,267,960,203,1080,176C1200,149,1320,160,1440,192L1440,320L0,320Z">
+            </path>
+        </svg>
     </div>
 
     <script>
@@ -135,22 +286,44 @@
                     y: scores,
                     type: 'scatter',
                     mode: 'lines+markers',
-                    name: 'Score'
+                    name: 'Score',
+                    line: { color: '#E9650E' },
+                    marker: { color: '#E9650E' }
                 },
                 {
                     x: engagement.map((_, i) => `Quiz ${i + 1}`),
                     y: engagement,
                     type: 'scatter',
                     mode: 'lines+markers',
-                    name: 'Engagement Boost'
+                    name: 'Engagement Boost',
+                    line: { color: '#249EA0' },
+                    marker: { color: '#249EA0' }
                 }
             ];
 
             Plotly.newPlot('profileChart', traces, {
-                title: "Performance Over Time",
+                title: {
+                    text: "Performance Over Time",
+                    font: { color: '#E9650E', family: 'Averia Sans Libre, sans-serif' }
+                },
                 paper_bgcolor: 'rgba(0,0,0,0)',
                 plot_bgcolor: 'rgba(0,0,0,0)',
-                font: { color: 'white' }
+                font: { color: '#222', family: 'Averia Sans Libre, sans-serif' },
+                xaxis: {
+                    title: 'Attempts',
+                    color: '#005F60',
+                    gridcolor: '#d7eeee',
+                    zerolinecolor: '#d7eeee'
+                },
+                yaxis: {
+                    title: 'Value',
+                    color: '#005F60',
+                    gridcolor: '#d7eeee',
+                    zerolinecolor: '#d7eeee'
+                },
+                legend: {
+                    font: { color: '#222' }
+                }
             });
         }
     </script>

@@ -2,97 +2,194 @@
 <html>
 
 <head>
-    <title>Leaderboard</title>
+    <title>Leaderboard | Adaptive Learning</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: "Averia Sans Libre", sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: #F5F7F6;
+            color: #222;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 20px 120px;
+            box-sizing: border-box;
+        }
+
+        .page-container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            background:
-                url("/static/images/background.jpg");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: white;
-            text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
         .card {
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            background: white;
             padding: 30px;
             margin: 20px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .leaderboard-header-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 30px 160px;
+            text-align: left;
+        }
+
+        .leaderboard-video {
+            width: 180px;
+            height: 230px;
+            object-fit: cover;
+            border-radius: 50% / 35%;
+            flex-shrink: 0;
+            background: #f3fbfb;
+            border: 2px solid #cfeaea;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+            text-align: center;
+        }
+
+        h1 {
+            color: #E9650E;
+            font-size: 3.2em;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #249EA0;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 18px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            overflow: hidden;
+            border-radius: 18px;
         }
 
         th {
-            background: #FFD700;
-            color: black;
-            padding: 12px;
+            background: #249EA0;
+            color: white;
+            padding: 14px 12px;
+            font-size: 15px;
+            text-align: center;
+            border-bottom: 4px solid #005F60;
         }
 
         td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 14px 12px;
+            border-bottom: 1px solid #d7eeee;
+            color: #222;
+            text-align: center;
         }
 
-        tr:hover {
-            background: rgba(255, 255, 255, 0.1);
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f3fbfb;
         }
 
         a {
-            color: #FFD700;
             text-decoration: none;
+            color: #E9650E;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 0 8px;
         }
 
         a:hover {
             text-decoration: underline;
+            color: #249EA0;
+        }
+
+        .nav-links {
+            line-height: 2;
         }
 
         .rank-1 {
-            color: gold;
+            color: #E9650E;
             font-weight: bold;
+            font-size: 1.05em;
         }
 
         .rank-2 {
-            color: silver;
+            color: #249EA0;
             font-weight: bold;
+            font-size: 1.05em;
         }
 
         .rank-3 {
-            color: #cd7f32;
+            color: #B8540A;
             font-weight: bold;
+            font-size: 1.05em;
         }
 
-        .leaderboard-mascot {
+        .bottom-wave {
             position: fixed;
-            bottom: 5px;
-            right: 5px;
-            width: 380px;
-            opacity: 0.95;
-            z-index: 500;
-            animation: float 3s ease-in-out infinite;
+            bottom: -40px;
+            left: 0;
+            width: 100%;
+            height: 220px;
+            z-index: 10;
+            pointer-events: none;
         }
 
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
+        .bottom-wave svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 22px;
             }
 
-            50% {
-                transform: translateY(-10px);
+            .leaderboard-header-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px 22px;
             }
 
-            100% {
-                transform: translateY(0px);
+            .leaderboard-info {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .leaderboard-video {
+                width: 150px;
+                height: 200px;
+            }
+
+            th,
+            td {
+                padding: 12px 10px;
+                font-size: 14px;
             }
         }
     </style>
@@ -100,42 +197,65 @@
 
 <body>
 
-    <div class="card">
-        <h1>Leaderboard</h1>
+    <div class="page-container">
+        <div class="card leaderboard-header-card">
+            <video class="leaderboard-video" autoplay muted loop playsinline>
+                <source src="/static/videos/leaderboard.mp4" type="video/mp4">
+            </video>
 
-        <table>
-            <tr>
-                <th>Rank</th>
-                <th>User</th>
-                <th>Avg Score</th>
-                <th>Total Engagement</th>
-                <th>Attempts</th>
-            </tr>
+            <div class="leaderboard-info">
+                <h1>Leaderboard</h1>
+                <p class="subtitle">Track top performers and engagement across all users</p>
+            </div>
+        </div>
 
-            {% for user in leaderboard %}
-            <tr>
-                <td class="
-                    {% if loop.index == 1 %}rank-1
-                    {% elif loop.index == 2 %}rank-2
-                    {% elif loop.index == 3 %}rank-3
-                    {% endif %}
-                ">
-                    {{ loop.index }}
-                </td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.avg_score }}</td>
-                <td>{{ user.engagement }}</td>
-                <td>{{ user.attempts }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User</th>
+                        <th>Avg Score</th>
+                        <th>Total Engagement</th>
+                        <th>Attempts</th>
+                    </tr>
 
-        <br>
-        <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
-        <a href="{{ url_for('profile') }}">My Profile</a> |
-        <a href="{{ url_for('logout') }}">Logout</a>
+                    {% for user in leaderboard %}
+                    <tr>
+                        <td class="
+                            {% if loop.index == 1 %}rank-1
+                            {% elif loop.index == 2 %}rank-2
+                            {% elif loop.index == 3 %}rank-3
+                            {% endif %}
+                        ">
+                            {{ loop.index }}
+                        </td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.avg_score }}</td>
+                        <td>{{ user.engagement }}</td>
+                        <td>{{ user.attempts }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+        <div class="card nav-links">
+            <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
+            <a href="{{ url_for('profile') }}">My Profile</a> |
+            <a href="{{ url_for('progress') }}">My Progress</a> |
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </div>
-    <img src="/static/images/leaderboardpage.png" class="leaderboard-mascot">
+
+    <div class="bottom-wave">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#E9650E"
+                d="M0,192C120,150,240,130,360,154.7C480,181,600,256,720,261.3C840,267,960,203,1080,176C1200,149,1320,160,1440,192L1440,320L0,320Z">
+            </path>
+        </svg>
+    </div>
+
 </body>
 
 </html>

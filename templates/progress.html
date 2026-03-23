@@ -2,97 +2,278 @@
 <html>
 
 <head>
-    <title>Learning Progress</title>
+    <title>Learning Progress | Adaptive Learning</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: "Averia Sans Libre", sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: #F5F7F6;
+            color: #222;
+            overflow-x: hidden;
+            position: relative;
+            padding: 40px 20px 120px;
+            box-sizing: border-box;
+        }
+
+        .page-container {
             max-width: 900px;
-            margin: auto;
-            padding: 20px;
-            background: url("/static/images/background.jpg");
-            background-size: cover;
-            color: white;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            color: #E9650E;
+            font-size: 2.5em;
             text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
         }
 
         .card {
-            background: rgba(0, 0, 0, 0.75);
+            background: white;
             padding: 30px;
-            border-radius: 20px;
+            border-radius: 24px;
             margin: 20px 0;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .metric-box {
+            background: #f3fbfb;
+            border: 1px solid #cfeaea;
+            border-radius: 18px;
+            padding: 20px 16px;
+        }
+
+        .metric-label {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #249EA0;
+        }
+
+        h3 {
+            color: #E9650E;
+            margin-bottom: 18px;
+            font-size: 1.5em;
         }
 
         .progress-bar {
             width: 100%;
-            background: #333;
+            background: #e3ecec;
             border-radius: 20px;
+            overflow: hidden;
+            height: 28px;
+            margin-top: 10px;
         }
 
         .progress-fill {
-            height: 25px;
-            background: #FFD700;
+            height: 100%;
+            background: #249EA0;
             border-radius: 20px;
             width: var(--progress);
             text-align: center;
-            line-height: 25px;
-            color: black;
+            line-height: 28px;
+            color: white;
             font-weight: bold;
             transition: width 0.8s ease;
         }
 
-        .metric {
-            font-size: 1.5em;
-            margin: 10px;
+        .progress-text {
+            margin-top: 12px;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .nav-links {
+            margin-top: 25px;
+            line-height: 2;
         }
 
         a {
-            color: #FFD700;
             text-decoration: none;
+            color: #E9650E;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 0 8px;
         }
 
         a:hover {
             text-decoration: underline;
+        }
+
+        .nav-links {
+            margin-top: 25px;
+            line-height: 2;
+        }
+
+        .progress-video {
+            position: fixed;
+            bottom: 50px;
+            width: 370px;
+            height: 380px;
+            object-fit: cover;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.35s ease, left 0.35s ease, right 0.35s ease;
+        }
+
+        .progress-video.show {
+            opacity: 0.95;
+        }
+
+        .progress-video.right {
+            right: 30px;
+            left: auto;
+        }
+
+        .progress-video.left {
+            left: 30px;
+            right: auto;
+        }
+
+        .bottom-wave {
+            position: fixed;
+            bottom: -40px;
+            left: 0;
+            width: 100%;
+            height: 220px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bottom-wave svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-video {
+                width: 150px;
+                height: 120px;
+            }
+
+            .progress-video.right {
+                right: 12px;
+            }
+
+            .progress-video.left {
+                left: 12px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <h1 style="color: #000;">Learning Progress</h1>
+    <div class="page-container">
+        <h1>Learning Progress</h1>
 
-    <div class="card">
+        <div class="card">
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-label">Current Streak</div>
+                    <div class="metric-value">{{ streak }}</div>
+                </div>
 
-        <div class="metric">
-            Current Streak: <b>{{ streak }}</b> days
-        </div>
+                <div class="metric-box">
+                    <div class="metric-label">Quizzes Completed</div>
+                    <div class="metric-value">{{ attempts }}</div>
+                </div>
 
-        <div class="metric">
-            Quizzes Completed: <b>{{ attempts }}</b>
-        </div>
+                <div class="metric-box">
+                    <div class="metric-label">Total Engagement</div>
+                    <div class="metric-value">{{ engagement }}</div>
+                </div>
+            </div>
 
-        <div class="metric">
-            Total Engagement: <b>{{ engagement }}</b>
-        </div>
+            <h3>Course Progress</h3>
 
-        <br>
+            <div class="progress-bar">
+                <div class="progress-fill" style="--progress: {{ progress }}%;">
+                    {{ progress }}%
+                </div>
+            </div>
 
-        <h3>Course Progress</h3>
+            <p class="progress-text">{{ progress }}% of the activity target completed</p>
 
-        <div class="progress-bar">
-            <div class="progress-fill" style="--progress: {{ progress }}%;">
-                {{ progress }}%
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
+                <a href="{{ url_for('profile') }}">My Profile</a> |
+                <a href="{{ url_for('leaderboard') }}">Leaderboard</a> |
+                <a href="{{ url_for('logout') }}">Logout</a>
             </div>
         </div>
-        <p>{{progress}}% of the activity target completed</p>
-
-        <br>
-
-        <a href="{{ url_for('dashboard') }}">Back to Quiz</a> |
-        <a href="{{ url_for('profile') }}">My Profile</a> |
-        <a href="{{ url_for('logout') }}">Logout</a>
-
     </div>
+
+    <video id="progressVideo" class="progress-video right show" autoplay muted playsinline>
+        <source src="/static/videos/progress.mp4" type="video/mp4">
+    </video>
+
+    <div class="bottom-wave">
+        <svg viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="#E9650E"
+                d="M0,192C120,150,240,130,360,154.7C480,181,600,256,720,261.3C840,267,960,203,1080,176C1200,149,1320,160,1440,192L1440,320L0,320Z">
+            </path>
+        </svg>
+    </div>
+
+    <script>
+        const progressVideo = document.getElementById("progressVideo");
+        let videoOnRight = true;
+
+        progressVideo.addEventListener("ended", () => {
+            progressVideo.classList.remove("show");
+
+            setTimeout(() => {
+                if (videoOnRight) {
+                    progressVideo.classList.remove("right");
+                    progressVideo.classList.add("left");
+                } else {
+                    progressVideo.classList.remove("left");
+                    progressVideo.classList.add("right");
+                }
+
+                videoOnRight = !videoOnRight;
+                progressVideo.currentTime = 0;
+                progressVideo.play();
+                progressVideo.classList.add("show");
+            }, 250);
+        });
+    </script>
 
 </body>
 
