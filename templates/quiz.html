@@ -438,22 +438,6 @@
             <div id="explanation"
                 style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin: 10px 0;">
             </div>
-            <div id="technicalExplainWrapper" style="display:none; margin: 12px 0; text-align:right;">
-                <button id="toggleTechnicalBtn" class="technical-btn" onclick="toggleTechnicalDetails()">
-                    <span class="question-icon">?</span>
-                    Show technical AI details
-                </button>
-
-                <div id="shapSection"
-                    style="background: rgba(255,255,255,0.08); padding: 15px; border-radius: 10px; margin: 12px 0 0 0; display:none; text-align: center;">
-                    <h4 style="margin-top:0;">Technical AI details</h4>
-                    <p style="opacity:0.85; font-size:14px; margin-top:0;">
-                        These values show which behavioural factors were most influential in the explainable AI
-                        analysis.
-                    </p>
-                    <div id="shapExplanation"></div>
-                </div>
-            </div>
             <div class="ml-badge">
                 AI Confidence: <span id="confidenceScore"></span>
             </div>
@@ -522,19 +506,6 @@
                 `linear-gradient(to right, #FF6B6B 0%, #FF6B6B ${value}%, #ffffff ${value}%, #ffffff 100%)`;
         }
 
-        function toggleTechnicalDetails() {
-            const shapSection = document.getElementById('shapSection');
-            const btn = document.getElementById('toggleTechnicalBtn');
-
-            if (shapSection.style.display === 'none' || shapSection.style.display === '') {
-                shapSection.style.display = 'block';
-                btn.innerHTML = '<span class="question-icon">?</span> Hide technical AI details';
-            } else {
-                shapSection.style.display = 'none';
-                btn.innerHTML = '<span class="question-icon">?</span> Show technical AI details';
-            }
-        }
-
         function animateValue(id, start, end, duration) {
 
             let range = end - start;
@@ -578,29 +549,6 @@
             animateValue("adaptiveScore", 0, result.engagement_boost, 800);
             animateValue("staticScore", 0, result.static_score, 800);
             document.getElementById('confidenceScore').textContent = result.confidence;
-            if (result.shap) {
-                const shapDiv = document.getElementById('shapExplanation');
-                const shapSection = document.getElementById('shapSection');
-                const shapWrapper = document.getElementById('technicalExplainWrapper');
-                const toggleBtn = document.getElementById('toggleTechnicalBtn');
-
-                shapDiv.innerHTML = "";
-                shapSection.style.display = "none";
-                shapWrapper.style.display = "block";
-                toggleBtn.innerHTML = '<span class="question-icon">?</span> Show technical AI details';
-
-                Object.entries(result.shap).forEach(([feature, value]) => {
-                    const line = document.createElement("div");
-                    line.style.margin = "6px 0";
-
-                    let readableFeature = feature
-                        .replaceAll("_", " ")
-                        .replace(/\b\w/g, c => c.toUpperCase());
-
-                    line.innerHTML = `<b>${readableFeature}</b>: ${value}`;
-                    shapDiv.appendChild(line);
-                });
-            }
 
             document.getElementById('rewardSection').style.display = 'block';
             showRewardPopup(result.reward);
