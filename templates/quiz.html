@@ -57,6 +57,7 @@
             text-align: center;
             margin: 20px 0;
             animation: pulse 1s ease;
+            color: #FFD700;
         }
 
         @keyframes pulse {
@@ -71,11 +72,6 @@
             100% {
                 transform: scale(1);
             }
-        }
-
-        .success {
-            background: #F8CF00;
-            color: #000;
         }
 
         button {
@@ -544,7 +540,7 @@
             const result = await response.json();
 
             document.getElementById('rewardDisplay').innerHTML = "Suggested Reward: " + result.reward;
-            document.getElementById('rewardDisplay').className = 'reward-display success';
+            document.getElementById('rewardDisplay').className = 'reward-display';
             document.getElementById('explanation').innerHTML = result.explanation;
             animateValue("adaptiveScore", 0, result.engagement_boost, 800);
             animateValue("staticScore", 0, result.static_score, 800);

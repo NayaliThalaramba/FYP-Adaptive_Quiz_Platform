@@ -114,15 +114,6 @@ def take_quiz():
     practice_frequency = min(1.0, len(attempts) / 10)
     recency = 1.0 if not attempts else 0.5
 
-    feature_names = [
-        'score',
-        'time_spent',
-        'prev_engagement',
-        'practice_accuracy',
-        'practice_frequency',
-        'recency'
-    ]
-
     features_df = pd.DataFrame([{
         'score': score,
         'time_spent': time_spent,
@@ -134,8 +125,6 @@ def take_quiz():
 
     ml_probs = model.predict_proba(features_df)[0]
     confidence = round(float(np.max(ml_probs)), 2)
-    ml_class_pos = int(np.argmax(ml_probs))
-    ml_class_label = int(model.classes_[ml_class_pos])
 
     # PPO State
     obs = np.array([
@@ -174,20 +163,13 @@ def take_quiz():
     db.session.add(new_attempt)
     db.session.commit()
 
-    top_features = {
-        "score": round(score, 2),
-        "engagement": round(prev_engagement, 2),
-        "frequency": round(practice_frequency, 2)
-    }
-
     return jsonify({
         'reward': reward_name,
         'explanation': explain_reward(reward_name, score, confidence),
         'engagement_boost': engagement_boost,
         'static_score': score,
         'confidence': confidence,
-        'history_length': questions_seen + 1,
-        'features_used' :top_features
+        'history_length': questions_seen + 1
     })
 
 @app.route('/register', methods=['GET', 'POST'])
