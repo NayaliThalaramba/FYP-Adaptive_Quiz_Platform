@@ -34,6 +34,7 @@
             text-align: center;
             margin-top: 0;
             margin-bottom: 20px;
+            line-height: 1.1;
         }
 
         .card {
@@ -43,6 +44,7 @@
             margin: 20px 0;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
             text-align: center;
+            box-sizing: border-box;
         }
 
         .metrics-grid {
@@ -57,6 +59,7 @@
             border: 1px solid #cfeaea;
             border-radius: 18px;
             padding: 20px 16px;
+            box-sizing: border-box;
         }
 
         .metric-label {
@@ -69,12 +72,14 @@
             font-size: 2em;
             font-weight: 700;
             color: #249EA0;
+            line-height: 1.1;
         }
 
         h3 {
             color: #E9650E;
             margin-bottom: 18px;
             font-size: 1.5em;
+            line-height: 1.15;
         }
 
         .progress-bar {
@@ -96,6 +101,7 @@
             color: white;
             font-weight: bold;
             transition: width 0.8s ease;
+            white-space: nowrap;
         }
 
         .progress-text {
@@ -119,11 +125,7 @@
 
         a:hover {
             text-decoration: underline;
-        }
-
-        .nav-links {
-            margin-top: 25px;
-            line-height: 2;
+            color: #249EA0;
         }
 
         .progress-video {
@@ -168,22 +170,120 @@
             display: block;
         }
 
+        @media (max-width: 1024px) {
+            body {
+                padding: 32px 18px 110px;
+            }
+
+            .page-container {
+                max-width: 820px;
+            }
+
+            h1 {
+                font-size: 2.25em;
+            }
+
+            .card {
+                padding: 26px;
+                margin: 18px 0;
+            }
+
+            .metrics-grid {
+                gap: 16px;
+            }
+
+            .metric-box {
+                padding: 18px 14px;
+            }
+
+            .metric-value {
+                font-size: 1.8em;
+            }
+
+            h3 {
+                font-size: 1.35em;
+            }
+
+            .progress-video {
+                width: 300px;
+                height: 310px;
+                bottom: 42px;
+            }
+
+            .progress-video.right {
+                right: 18px;
+            }
+
+            .progress-video.left {
+                left: 18px;
+            }
+
+            .bottom-wave {
+                height: 200px;
+                bottom: -28px;
+            }
+        }
+
         @media (max-width: 768px) {
+            body {
+                padding: 24px 14px 95px;
+            }
+
             h1 {
                 font-size: 2em;
+                margin-bottom: 16px;
             }
 
             .card {
                 padding: 22px;
+                margin: 16px 0;
             }
 
             .metrics-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                margin-bottom: 22px;
+            }
+
+            .metric-box {
+                padding: 16px 10px;
+            }
+
+            .metric-label {
+                font-size: 13.5px;
+            }
+
+            .metric-value {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1.25em;
+                margin-bottom: 14px;
+            }
+
+            .progress-bar {
+                height: 24px;
+            }
+
+            .progress-fill {
+                line-height: 24px;
+                font-size: 13px;
+            }
+
+            .progress-text {
+                font-size: 14px;
+            }
+
+            a {
+                font-size: 14px;
+                margin: 0 6px;
             }
 
             .progress-video {
-                width: 150px;
-                height: 120px;
+                width: 200px;
+                height: 205px;
+                bottom: 34px;
             }
 
             .progress-video.right {
@@ -192,6 +292,94 @@
 
             .progress-video.left {
                 left: 12px;
+            }
+
+            .bottom-wave {
+                height: 175px;
+                bottom: -24px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 18px 10px 82px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 14px;
+            }
+
+            .card {
+                padding: 18px 14px;
+                margin: 14px 0;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 18px;
+            }
+
+            .metric-box {
+                max-width: 260px;
+                width: 100%;
+                margin: 0 auto;
+                padding: 14px 12px;
+            }
+
+            .metric-label {
+                font-size: 13px;
+            }
+
+            .metric-value {
+                font-size: 1.35em;
+            }
+
+            h3 {
+                font-size: 1.15em;
+                margin-bottom: 12px;
+            }
+
+            .progress-bar {
+                height: 22px;
+            }
+
+            .progress-fill {
+                line-height: 22px;
+                font-size: 12px;
+            }
+
+            .progress-text {
+                font-size: 13px;
+            }
+
+            a {
+                font-size: 13px;
+                margin: 0 4px;
+            }
+
+            .nav-links {
+                line-height: 1.9;
+            }
+
+            .progress-video {
+                width: 135px;
+                height: 140px;
+                bottom: 28px;
+            }
+
+            .progress-video.right {
+                right: 8px;
+            }
+
+            .progress-video.left {
+                left: 8px;
+            }
+
+            .bottom-wave {
+                height: 150px;
+                bottom: -16px;
             }
         }
     </style>

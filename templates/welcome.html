@@ -11,8 +11,8 @@
 
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            height: 100vh;
+            font-family: "Averia Sans Libre", sans-serif;
+            min-height: 100vh;
             margin: 0;
             background: #F5F7F6;
             display: flex;
@@ -21,10 +21,13 @@
             text-align: center;
             overflow: hidden;
             position: relative;
+            padding: 30px 20px 120px;
+            box-sizing: border-box;
         }
 
         .container {
             max-width: 700px;
+            width: 100%;
             padding: 40px;
             display: flex;
             flex-direction: column;
@@ -32,6 +35,7 @@
             justify-content: center;
             z-index: 3;
             position: relative;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -39,8 +43,9 @@
             font-weight: 700;
             font-style: normal;
             font-size: 3.5em;
-            margin-bottom: 20px;
+            margin: 0 0 20px;
             color: #E9650E;
+            line-height: 1.1;
         }
 
         p {
@@ -48,7 +53,7 @@
             font-weight: 400;
             font-style: italic;
             font-size: 1.2em;
-            margin-bottom: 35px;
+            margin: 0 0 35px;
             color: #222;
             line-height: 1.7;
             max-width: 600px;
@@ -57,8 +62,14 @@
         .button-group {
             display: flex;
             gap: 20px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             justify-content: center;
+            align-items: center;
+        }
+
+        .btn-wrap {
+            position: relative;
+            display: inline-block;
         }
 
         .btn {
@@ -72,6 +83,9 @@
             display: inline-block;
             transition: all 0.3s ease;
             border-bottom: 5px solid #B8540A;
+            position: relative;
+            z-index: 3;
+            white-space: nowrap;
         }
 
         .btn:hover {
@@ -88,7 +102,10 @@
             z-index: 1;
             pointer-events: none;
             border-radius: 50% / 35%;
+            border: 4px solid #249EA0;
+            box-sizing: border-box;
             animation: moveTopSides 12s infinite ease-in-out;
+            opacity: 0.95;
         }
 
         @keyframes moveTopSides {
@@ -123,9 +140,65 @@
             }
         }
 
+        .burst-icon {
+            position: absolute;
+            width: 78px;
+            height: 78px;
+            object-fit: contain;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(0, 0) scale(0.4) rotate(0deg);
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+            z-index: 2;
+        }
+
+        .login-wrap .burst-1,
+        .login-wrap .burst-2,
+        .login-wrap .burst-3 {
+            right: calc(100% - 8px);
+            top: 50%;
+        }
+
+        .login-wrap:hover .burst-1 {
+            opacity: 1;
+            transform: translate(-95px, -85px) scale(1) rotate(-28deg);
+        }
+
+        .login-wrap:hover .burst-2 {
+            opacity: 1;
+            transform: translate(-255px, -18px) scale(1) rotate(18deg);
+        }
+
+        .login-wrap:hover .burst-3 {
+            opacity: 1;
+            transform: translate(-105px, 78px) scale(1) rotate(30deg);
+        }
+
+        .register-wrap .burst-1,
+        .register-wrap .burst-2,
+        .register-wrap .burst-3 {
+            left: calc(100% - 8px);
+            top: 50%;
+        }
+
+        .register-wrap:hover .burst-1 {
+            opacity: 1;
+            transform: translate(95px, -85px) scale(1) rotate(28deg);
+        }
+
+        .register-wrap:hover .burst-2 {
+            opacity: 1;
+            transform: translate(255px, -8px) scale(1) rotate(-18deg);
+        }
+
+        .register-wrap:hover .burst-3 {
+            opacity: 1;
+            transform: translate(105px, 78px) scale(1) rotate(-30deg);
+        }
+
         .bottom-wave {
             position: fixed;
-            bottom: -40px;
+            bottom: -35px;
             left: 0;
             width: 100%;
             height: 220px;
@@ -137,6 +210,297 @@
             width: 100%;
             height: 100%;
             display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 620px;
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 3em;
+            }
+
+            p {
+                font-size: 1.1em;
+                max-width: 540px;
+            }
+
+            .btn {
+                padding: 13px 30px;
+                font-size: 17px;
+            }
+
+            .floating-video {
+                width: 280px;
+                height: 360px;
+            }
+
+            @keyframes moveTopSides {
+                0% {
+                    top: 25px;
+                    left: calc(100% - 330px);
+                    opacity: 1;
+                }
+
+                45% {
+                    top: 25px;
+                    left: 25px;
+                    opacity: 1;
+                }
+
+                50% {
+                    top: 25px;
+                    left: 25px;
+                    opacity: 1;
+                }
+
+                95% {
+                    top: 25px;
+                    left: calc(100% - 330px);
+                    opacity: 1;
+                }
+
+                100% {
+                    top: 25px;
+                    left: calc(100% - 330px);
+                    opacity: 1;
+                }
+            }
+
+            .burst-icon {
+                width: 58px;
+                height: 58px;
+            }
+
+            .login-wrap:hover .burst-1 {
+                transform: translate(-72px, -65px) scale(1) rotate(-28deg);
+            }
+
+            .login-wrap:hover .burst-2 {
+                transform: translate(-180px, -14px) scale(1) rotate(18deg);
+            }
+
+            .login-wrap:hover .burst-3 {
+                transform: translate(-82px, 58px) scale(1) rotate(30deg);
+            }
+
+            .register-wrap:hover .burst-1 {
+                transform: translate(72px, -65px) scale(1) rotate(28deg);
+            }
+
+            .register-wrap:hover .burst-2 {
+                transform: translate(180px, -8px) scale(1) rotate(-18deg);
+            }
+
+            .register-wrap:hover .burst-3 {
+                transform: translate(82px, 58px) scale(1) rotate(-30deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 25px 16px 110px;
+            }
+
+            .container {
+                max-width: 560px;
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 2.5em;
+                margin-bottom: 16px;
+            }
+
+            p {
+                font-size: 1em;
+                margin-bottom: 28px;
+                max-width: 500px;
+            }
+
+            .button-group {
+                gap: 14px;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+
+            .floating-video {
+                width: 210px;
+                height: 270px;
+                border-width: 3px;
+            }
+
+            @keyframes moveTopSides {
+                0% {
+                    top: 18px;
+                    left: calc(100% - 245px);
+                    opacity: 1;
+                }
+
+                45% {
+                    top: 18px;
+                    left: 18px;
+                    opacity: 1;
+                }
+
+                50% {
+                    top: 18px;
+                    left: 18px;
+                    opacity: 1;
+                }
+
+                95% {
+                    top: 18px;
+                    left: calc(100% - 245px);
+                    opacity: 1;
+                }
+
+                100% {
+                    top: 18px;
+                    left: calc(100% - 245px);
+                    opacity: 1;
+                }
+            }
+
+            .burst-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .login-wrap:hover .burst-1 {
+                transform: translate(-55px, -45px) scale(1) rotate(-28deg);
+            }
+
+            .login-wrap:hover .burst-2 {
+                transform: translate(-120px, -12px) scale(1) rotate(18deg);
+            }
+
+            .login-wrap:hover .burst-3 {
+                transform: translate(-62px, 42px) scale(1) rotate(30deg);
+            }
+
+            .register-wrap:hover .burst-1 {
+                transform: translate(55px, -45px) scale(1) rotate(28deg);
+            }
+
+            .register-wrap:hover .burst-2 {
+                transform: translate(120px, -8px) scale(1) rotate(-18deg);
+            }
+
+            .register-wrap:hover .burst-3 {
+                transform: translate(62px, 42px) scale(1) rotate(-30deg);
+            }
+
+            .bottom-wave {
+                height: 180px;
+                bottom: -25px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 20px 14px 95px;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 18px 10px;
+            }
+
+            h1 {
+                font-size: 2.1em;
+            }
+
+            p {
+                font-size: 0.95em;
+                margin-bottom: 24px;
+                max-width: 100%;
+            }
+
+            .button-group {
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 11px 18px;
+                font-size: 15px;
+            }
+
+            .floating-video {
+                width: 140px;
+                height: 180px;
+                border-width: 3px;
+            }
+
+            @keyframes moveTopSides {
+                0% {
+                    top: 16px;
+                    left: calc(100% - 165px);
+                    opacity: 0.92;
+                }
+
+                45% {
+                    top: 16px;
+                    left: 16px;
+                    opacity: 0.92;
+                }
+
+                50% {
+                    top: 16px;
+                    left: 16px;
+                    opacity: 0.92;
+                }
+
+                95% {
+                    top: 16px;
+                    left: calc(100% - 165px);
+                    opacity: 0.92;
+                }
+
+                100% {
+                    top: 16px;
+                    left: calc(100% - 165px);
+                    opacity: 0.92;
+                }
+            }
+
+            .burst-icon {
+                width: 26px;
+                height: 26px;
+            }
+
+            .login-wrap:hover .burst-1 {
+                transform: translate(-32px, -28px) scale(1) rotate(-28deg);
+            }
+
+            .login-wrap:hover .burst-2 {
+                transform: translate(-68px, -8px) scale(1) rotate(18deg);
+            }
+
+            .login-wrap:hover .burst-3 {
+                transform: translate(-36px, 26px) scale(1) rotate(30deg);
+            }
+
+            .register-wrap:hover .burst-1 {
+                transform: translate(32px, -28px) scale(1) rotate(28deg);
+            }
+
+            .register-wrap:hover .burst-2 {
+                transform: translate(68px, -8px) scale(1) rotate(-18deg);
+            }
+
+            .register-wrap:hover .burst-3 {
+                transform: translate(36px, 26px) scale(1) rotate(-30deg);
+            }
+
+            .bottom-wave {
+                height: 150px;
+            }
         }
     </style>
 </head>
@@ -155,8 +519,19 @@
         </p>
 
         <div class="button-group">
-            <a class="btn" href="{{ url_for('login') }}">Login</a>
-            <a class="btn" href="{{ url_for('register') }}">Register</a>
+            <div class="btn-wrap login-wrap">
+                <img src="/static/images/star.png" alt="" class="burst-icon burst-1">
+                <img src="/static/images/fire.png" alt="" class="burst-icon burst-2">
+                <img src="/static/images/trophy.png" alt="" class="burst-icon burst-3">
+                <a class="btn" href="{{ url_for('login') }}">Login</a>
+            </div>
+
+            <div class="btn-wrap register-wrap">
+                <img src="/static/images/badges.png" alt="" class="burst-icon burst-1">
+                <img src="/static/images/star.png" alt="" class="burst-icon burst-2">
+                <img src="/static/images/fire.png" alt="" class="burst-icon burst-3">
+                <a class="btn" href="{{ url_for('register') }}">Register</a>
+            </div>
         </div>
     </div>
 

@@ -20,17 +20,21 @@
             background: #F5F7F6;
             overflow: hidden;
             position: relative;
+            padding: 24px 20px 110px;
+            box-sizing: border-box;
         }
 
         .card {
             background: white;
             padding: 35px;
             width: 380px;
+            max-width: 100%;
             border-radius: 24px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
             text-align: center;
             z-index: 2;
             position: relative;
+            box-sizing: border-box;
         }
 
         .register-header {
@@ -39,6 +43,7 @@
             justify-content: flex-start;
             gap: 12px;
             margin-bottom: -50px;
+            min-height: 140px;
         }
 
         .register-video-inside {
@@ -47,6 +52,7 @@
             object-fit: contain;
             flex-shrink: 0;
             margin-left: -42px;
+            pointer-events: none;
         }
 
         h1 {
@@ -54,6 +60,8 @@
             font-size: 2.7em;
             margin: 0;
             color: #E9650E;
+            line-height: 1.05;
+            text-align: left;
         }
 
         input {
@@ -66,6 +74,7 @@
             background: #fff;
             color: #222;
             box-sizing: border-box;
+            font-family: "Averia Sans Libre", sans-serif;
         }
 
         input:focus {
@@ -87,6 +96,7 @@
             cursor: pointer;
             transition: 0.3s;
             border-bottom: 5px solid #005F60;
+            font-family: "Averia Sans Libre", sans-serif;
         }
 
         button:hover {
@@ -115,6 +125,7 @@
             padding: 10px;
             border-radius: 10px;
             font-size: 14px;
+            box-sizing: border-box;
         }
 
         .flash-message.error {
@@ -145,6 +156,7 @@
             transform: translateY(-50%);
             cursor: pointer;
             color: #777;
+            font-size: 18px;
         }
 
         .toggle-password:hover {
@@ -161,22 +173,165 @@
             pointer-events: none;
         }
 
-        @media (max-width: 768px) {
+        .bottom-wave svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
             .card {
-                width: 340px;
-                padding: 25px;
+                width: 360px;
+                padding: 30px 26px;
             }
 
-            .register-video {
-                width: 150px;
-                height: 120px;
-                left: 12px;
-                bottom: 20px;
+            .register-header {
+                margin-bottom: -34px;
+                min-height: 120px;
+                gap: 10px;
+            }
+
+            .register-video-inside {
+                width: 80px;
+                height: 210px;
+                margin-left: -34px;
+            }
+
+            h1 {
+                font-size: 2.35em;
+            }
+
+            input,
+            button,
+            .password-wrapper input,
+            .flash-message {
+                width: 92%;
+            }
+
+            .bottom-wave {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 16px 95px;
+            }
+
+            .card {
+                width: 340px;
+                padding: 25px 22px;
+            }
+
+            .register-header {
+                margin-bottom: -22px;
+                min-height: 100px;
+                gap: 8px;
             }
 
             .register-video-inside {
                 width: 70px;
-                height: 90px;
+                height: 165px;
+                margin-left: -24px;
+            }
+
+            h1 {
+                font-size: 2.05em;
+            }
+
+            input {
+                font-size: 14px;
+                padding: 11px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 11px;
+            }
+
+            a {
+                font-size: 14px;
+                margin-top: 16px;
+            }
+
+            .flash-message {
+                font-size: 13px;
+                padding: 9px;
+            }
+
+            .toggle-password {
+                right: 24px;
+                font-size: 16px;
+            }
+
+            .bottom-wave {
+                height: 220px;
+                bottom: -28px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 16px 12px 85px;
+            }
+
+            .card {
+                width: 300px;
+                padding: 22px 18px;
+            }
+
+            .register-header {
+                margin-bottom: -14px;
+                min-height: 82px;
+                gap: 6px;
+            }
+
+            .register-video-inside {
+                width: 55px;
+                height: 120px;
+                margin-left: -12px;
+            }
+
+            h1 {
+                font-size: 1.7em;
+            }
+
+            input,
+            button,
+            .password-wrapper input,
+            .flash-message {
+                width: 94%;
+            }
+
+            input {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 14px;
+                margin-top: 16px;
+            }
+
+            a {
+                font-size: 13px;
+                margin-top: 14px;
+            }
+
+            .flash-message {
+                font-size: 12.5px;
+                padding: 8px;
+            }
+
+            .toggle-password {
+                right: 20px;
+                font-size: 15px;
+            }
+
+            .bottom-wave {
+                height: 180px;
+                bottom: -18px;
             }
         }
     </style>
@@ -244,6 +399,7 @@
                 icon.classList.replace("fa-eye-slash", "fa-eye");
             }
         }
+
         const insideVideo = document.querySelector(".register-video-inside");
         insideVideo.playbackRate = 0.3;
     </script>

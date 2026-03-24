@@ -32,8 +32,9 @@
         h1 {
             color: #E9650E;
             font-size: 2.5em;
-            margin-bottom: 20px;
+            margin: 0 0 20px;
             text-align: center;
+            line-height: 1.1;
         }
 
         .card {
@@ -43,6 +44,7 @@
             border-radius: 24px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
             text-align: center;
+            box-sizing: border-box;
         }
 
         .stats-card {
@@ -74,6 +76,7 @@
             border-radius: 18px;
             padding: 20px 30px;
             min-width: 200px;
+            box-sizing: border-box;
         }
 
         .stat-label {
@@ -86,12 +89,14 @@
             font-size: 2em;
             font-weight: bold;
             color: #249EA0;
+            line-height: 1.1;
         }
 
         h3 {
             color: #E9650E;
-            margin-bottom: 15px;
+            margin: 0 0 15px;
             font-size: 1.5em;
+            line-height: 1.15;
         }
 
         a {
@@ -118,6 +123,7 @@
         .bottom-wave svg {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
         .top-right-nav {
@@ -137,6 +143,7 @@
             font-size: 14px;
             border-bottom: 4px solid #005F60;
             transition: 0.3s;
+            display: inline-block;
         }
 
         .top-right-nav a:hover {
@@ -147,26 +154,333 @@
             color: white;
         }
 
-        @media (max-width: 768px) {
-            .stat {
-                width: 80%;
+        #rewardChart,
+        #engagementChart {
+            width: 100%;
+            min-height: 340px;
+        }
+
+        .card-header-with-carousel {
+            display: grid;
+            grid-template-columns: 1fr auto auto 1fr;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 10px;
+        }
+
+        .card-header-spacer {
+            grid-column: 1;
+            width: 1px;
+            height: 1px;
+        }
+
+        .card-header-with-carousel h3 {
+            grid-column: 2 / 4;
+            margin: 0;
+            text-align: center;
+            justify-self: center;
+        }
+
+        .mini-carousel {
+            grid-column: 4;
+            justify-self: end;
+            width: 250px;
+            height: 105px;
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mini-carousel-track {
+            position: relative;
+            width: 170px;
+            height: 74px;
+        }
+
+        .carousel-item {
+            position: absolute;
+            top: 50%;
+            width: 80px;
+            height: 90px;
+            object-fit: contain;
+            transform: translateY(-50%) scale(0.75);
+            opacity: 0;
+            transition: all 0.55s ease;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
+        }
+
+        .carousel-item.pos-left {
+            left: -36px;
+            opacity: 0.7;
+            transform: translateY(-50%) scale(0.82);
+        }
+
+        .carousel-item.pos-center {
+            left: 50%;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.42);
+            z-index: 2;
+        }
+
+        .carousel-item.pos-right {
+            right: -36px;
+            opacity: 0.7;
+            transform: translateY(-50%) scale(0.82);
+        }
+
+        .carousel-item.pos-hidden-right {
+            right: -40px;
+            opacity: 0;
+            transform: translateY(-50%) scale(0.6);
+        }
+
+        .carousel-item.pos-hidden-left {
+            left: -40px;
+            opacity: 0;
+            transform: translateY(-50%) scale(0.6);
+        }
+
+        @media (max-width: 1024px) {
+            body {
+                padding: 32px 18px 110px;
             }
 
-            .admin-mascot-inside {
-                width: 85px;
-                top: 16px;
-                left: 16px;
+            .page-container {
+                max-width: 920px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+                margin-bottom: 18px;
+            }
+
+            .card {
+                padding: 26px;
+                margin: 18px 0;
             }
 
             .stats-card {
                 padding-top: 80px;
             }
 
-            .admin-video {
-                width: 160px;
-                height: 130px;
-                right: 15px;
-                bottom: 20px;
+            .admin-mascot-inside {
+                width: 155px;
+                top: -48px;
+                left: -18px;
+            }
+
+            .stats {
+                gap: 18px;
+            }
+
+            .stat {
+                min-width: 180px;
+                padding: 18px 22px;
+            }
+
+            .stat-value {
+                font-size: 1.8em;
+            }
+
+            h3 {
+                font-size: 1.35em;
+            }
+
+            #rewardChart,
+            #engagementChart {
+                min-height: 310px;
+            }
+
+            .top-right-nav {
+                top: 18px;
+                right: 24px;
+            }
+
+            .bottom-wave {
+                height: 200px;
+                bottom: -28px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 24px 14px 95px;
+            }
+
+            h1 {
+                font-size: 1.95em;
+                margin-bottom: 16px;
+            }
+
+            .card {
+                padding: 22px;
+                margin: 16px 0;
+            }
+
+            .stats-card {
+                padding-top: 72px;
+            }
+
+            .admin-mascot-inside {
+                width: 110px;
+                top: -20px;
+                left: 8px;
+            }
+
+            .stats {
+                gap: 14px;
+            }
+
+            .stat {
+                min-width: 160px;
+                padding: 16px 18px;
+            }
+
+            .stat-label {
+                font-size: 14px;
+            }
+
+            .stat-value {
+                font-size: 1.55em;
+            }
+
+            h3 {
+                font-size: 1.25em;
+                margin-bottom: 12px;
+            }
+
+            #rewardChart,
+            #engagementChart {
+                min-height: 280px;
+            }
+
+            .top-right-nav {
+                top: 16px;
+                right: 16px;
+            }
+
+            .top-right-nav a {
+                padding: 9px 16px;
+                font-size: 13px;
+            }
+
+            .bottom-wave {
+                height: 175px;
+                bottom: -24px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 18px 10px 82px;
+            }
+
+            h1 {
+                font-size: 1.7em;
+                margin-bottom: 14px;
+                padding-top: 34px;
+            }
+
+            .card {
+                padding: 18px 14px;
+                margin: 14px 0;
+            }
+
+            .stats-card {
+                padding-top: 64px;
+            }
+
+            .admin-mascot-inside {
+                width: 90px;
+                top: -10px;
+                left: 8px;
+            }
+
+            .stats {
+                gap: 10px;
+            }
+
+            .stat {
+                width: 100%;
+                min-width: 0;
+                max-width: 260px;
+                padding: 14px 16px;
+            }
+
+            .stat-label {
+                font-size: 13px;
+            }
+
+            .stat-value {
+                font-size: 1.4em;
+            }
+
+            h3 {
+                font-size: 1.15em;
+            }
+
+            #rewardChart,
+            #engagementChart {
+                min-height: 240px;
+            }
+
+            .top-right-nav {
+                top: 12px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+
+            .top-right-nav a {
+                padding: 8px 14px;
+                font-size: 12.5px;
+            }
+
+            .bottom-wave {
+                height: 150px;
+                bottom: -16px;
+            }
+
+            .card-header-with-carousel {
+                gap: 10px;
+                grid-template-columns: 1fr auto auto 1fr;
+            }
+
+            .card-header-spacer {
+                width: 120px;
+            }
+
+            .mini-carousel {
+                width: 120px;
+                height: 58px;
+            }
+
+            .mini-carousel-track {
+                width: 120px;
+                height: 58px;
+            }
+
+            .carousel-item {
+                width: 26px;
+                height: 26px;
+            }
+
+            .carousel-item.pos-left {
+                left: 4px;
+            }
+
+            .carousel-item.pos-right {
+                right: 4px;
+            }
+
+            .carousel-item.pos-center {
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+
+            .card-header-with-carousel h3 {
+                font-size: 1.05em;
             }
         }
     </style>
@@ -203,7 +517,21 @@
         </div>
 
         <div class="card">
-            <h3>Reward Distribution</h3>
+            <div class="card-header-with-carousel">
+                <div class="card-header-spacer"></div>
+
+                <h3>Reward Distribution</h3>
+
+                <div class="mini-carousel">
+                    <div class="mini-carousel-track" id="miniCarouselTrack">
+                        <img src="/static/images/trophy.png" alt="reward icon" class="carousel-item">
+                        <img src="/static/images/fire.png" alt="reward icon" class="carousel-item">
+                        <img src="/static/images/badges.png" alt="reward icon" class="carousel-item">
+                        <img src="/static/images/star.png" alt="reward icon" class="carousel-item">
+                    </div>
+                </div>
+            </div>
+
             <div id="rewardChart"></div>
         </div>
 
@@ -283,6 +611,46 @@
                 font: { color: '#222' }
             }
         });
+
+        const carouselItems = document.querySelectorAll(".mini-carousel .carousel-item");
+        let centerIndex = 1;
+
+        function updateMiniCarousel() {
+            carouselItems.forEach((item, index) => {
+                item.classList.remove(
+                    "pos-left",
+                    "pos-center",
+                    "pos-right",
+                    "pos-hidden-right",
+                    "pos-hidden-left"
+                );
+
+                const total = carouselItems.length;
+
+                const leftIndex = (centerIndex - 1 + total) % total;
+                const rightIndex = (centerIndex + 1) % total;
+                const hiddenRightIndex = (centerIndex + 2) % total;
+
+                if (index === centerIndex) {
+                    item.classList.add("pos-center");
+                } else if (index === leftIndex) {
+                    item.classList.add("pos-left");
+                } else if (index === rightIndex) {
+                    item.classList.add("pos-right");
+                } else if (index === hiddenRightIndex) {
+                    item.classList.add("pos-hidden-right");
+                } else {
+                    item.classList.add("pos-hidden-left");
+                }
+            });
+        }
+
+        updateMiniCarousel();
+
+        setInterval(() => {
+            centerIndex = (centerIndex + 1) % carouselItems.length;
+            updateMiniCarousel();
+        }, 1800);
     </script>
 
 </body>

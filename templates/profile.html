@@ -36,6 +36,7 @@
             border-radius: 24px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
             text-align: center;
+            box-sizing: border-box;
         }
 
         .profile-header-card {
@@ -70,11 +71,13 @@
         h2 {
             font-size: 2.2em;
             margin-bottom: 10px;
+            line-height: 1.1;
         }
 
         h3 {
             font-size: 1.6em;
             margin-bottom: 15px;
+            line-height: 1.15;
         }
 
         p {
@@ -87,6 +90,7 @@
             color: #249EA0;
             font-size: 16px;
             font-weight: 600;
+            word-break: break-word;
         }
 
         .stats {
@@ -104,6 +108,7 @@
             padding: 20px 30px;
             min-width: 180px;
             text-align: center;
+            box-sizing: border-box;
         }
 
         .stat-label {
@@ -116,6 +121,7 @@
             font-size: 2em;
             font-weight: bold;
             color: #249EA0;
+            line-height: 1.1;
         }
 
         ul {
@@ -132,6 +138,8 @@
             border: 1px solid #cfeaea;
             color: #222;
             text-align: left;
+            box-sizing: border-box;
+            word-break: break-word;
         }
 
         a {
@@ -172,36 +180,221 @@
             display: block;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
+            body {
+                padding: 32px 18px 110px;
+            }
+
+            .page-container {
+                max-width: 920px;
+            }
+
             .card {
-                padding: 22px;
+                padding: 26px;
+                margin: 18px 0;
             }
 
             .profile-header-card {
-                flex-direction: column;
-                text-align: center;
-                padding: 30px 22px;
+                padding: 40px 34px;
+                gap: 16px;
             }
 
-            .profile-info {
-                width: 100%;
+            .profile-video {
+                width: 160px;
+                height: 205px;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+
+            h3 {
+                font-size: 1.45em;
             }
 
             .stats {
-                justify-content: center;
+                gap: 24px;
+            }
+
+            .stat {
+                min-width: 165px;
+                padding: 18px 24px;
+            }
+
+            .stat-value {
+                font-size: 1.8em;
+            }
+
+            #profileChart {
+                height: 370px;
+            }
+
+            .bottom-wave {
+                height: 200px;
+                bottom: -28px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 24px 14px 95px;
+            }
+
+            .card {
+                padding: 22px;
+                margin: 16px 0;
+            }
+
+            .profile-header-card {
+                padding: 30px 22px;
+                gap: 14px;
+            }
+
+            .profile-video {
+                width: 145px;
+                height: 190px;
             }
 
             h2 {
                 font-size: 1.8em;
             }
 
+            h3 {
+                font-size: 1.35em;
+            }
+
+            p {
+                font-size: 14px;
+            }
+
+            .email-text {
+                font-size: 15px;
+            }
+
+            .stats {
+                gap: 16px;
+                margin-top: 20px;
+            }
+
             .stat {
-                width: 80%;
+                min-width: 150px;
+                padding: 16px 18px;
+            }
+
+            .stat-label {
+                font-size: 14px;
+            }
+
+            .stat-value {
+                font-size: 1.55em;
+            }
+
+            li {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+
+            a {
+                font-size: 14px;
+                margin: 0 6px;
+            }
+
+            #profileChart {
+                height: 320px;
+            }
+
+            .bottom-wave {
+                height: 180px;
+                bottom: -24px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 18px 10px 82px;
+            }
+
+            .card {
+                padding: 18px 14px;
+                margin: 14px 0;
+            }
+
+            .profile-header-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px 14px;
+                gap: 12px;
+            }
+
+            .profile-info {
+                width: 100%;
             }
 
             .profile-video {
-                width: 150px;
-                height: 200px;
+                width: 120px;
+                height: 155px;
+            }
+
+            h2 {
+                font-size: 1.55em;
+                margin-bottom: 8px;
+            }
+
+            h3 {
+                font-size: 1.2em;
+                margin-bottom: 12px;
+            }
+
+            p {
+                font-size: 13.5px;
+            }
+
+            .email-text {
+                font-size: 14px;
+            }
+
+            .stats {
+                justify-content: center;
+                gap: 12px;
+                margin-top: 16px;
+            }
+
+            .stat {
+                width: 100%;
+                max-width: 240px;
+                min-width: 0;
+                padding: 14px 16px;
+            }
+
+            .stat-label {
+                font-size: 13px;
+            }
+
+            .stat-value {
+                font-size: 1.4em;
+            }
+
+            li {
+                font-size: 13.5px;
+                padding: 11px 12px;
+            }
+
+            a {
+                font-size: 13px;
+                margin: 0 4px;
+            }
+
+            .nav-links {
+                line-height: 1.9;
+            }
+
+            #profileChart {
+                height: 280px;
+            }
+
+            .bottom-wave {
+                height: 150px;
+                bottom: -16px;
             }
         }
     </style>

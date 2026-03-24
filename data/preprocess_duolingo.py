@@ -20,7 +20,6 @@ ml_data = df[[
     "recency"
 ]]
 
-# Normalizing values
 ml_data = (ml_data - ml_data.min()) / (ml_data.max() - ml_data.min())
 
 ml_data.to_csv("data/duolingo_features.csv", index=False)

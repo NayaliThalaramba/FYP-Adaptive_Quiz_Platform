@@ -20,18 +20,22 @@
             background: #F5F7F6;
             overflow: hidden;
             position: relative;
+            padding: 24px 20px 110px;
+            box-sizing: border-box;
         }
 
         .card {
             background: white;
             padding: 40px;
             width: 380px;
+            max-width: 100%;
             border-radius: 24px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
             text-align: center;
             z-index: 2;
             position: relative;
             overflow: visible;
+            box-sizing: border-box;
         }
 
         .login-mascot {
@@ -47,8 +51,9 @@
         h1 {
             font-weight: 700;
             font-size: 2.4em;
-            margin-bottom: 25px;
+            margin: 0 0 25px;
             color: #E9650E;
+            line-height: 1.1;
         }
 
         input {
@@ -202,40 +207,217 @@
             width: 165px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .card {
-                width: 340px;
+                width: 350px;
+                padding: 34px 28px;
+            }
+
+            .login-mascot {
+                width: 235px;
+                top: -110px;
+                right: -95px;
+            }
+
+            h1 {
+                font-size: 2.15em;
+                margin-bottom: 20px;
+            }
+
+            input,
+            button,
+            .password-wrapper input,
+            .flash-message {
+                width: 92%;
+            }
+
+            .bg-1 {
+                width: 140px;
+                top: 35px;
+                left: 30px;
+            }
+
+            .bg-2 {
+                width: 125px;
+                top: 70px;
+                right: 45px;
+            }
+
+            .bg-3 {
+                width: 140px;
+                bottom: 130px;
+                left: 35px;
+            }
+
+            .bg-4 {
+                width: 130px;
+                bottom: 150px;
+                right: 35px;
+            }
+
+            .bottom-wave {
+                height: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 16px 95px;
+            }
+
+            .card {
+                width: 330px;
                 padding: 28px 22px;
             }
 
             .login-mascot {
-                width: 150px;
-                top: -70px;
-                right: -55px;
+                width: 170px;
+                top: -75px;
+                right: -58px;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin-bottom: 18px;
+            }
+
+            input {
+                font-size: 14px;
+                padding: 11px;
+            }
+
+            button {
+                font-size: 15px;
+                padding: 11px;
+            }
+
+            a {
+                font-size: 14px;
+                margin-top: 16px;
+            }
+
+            .flash-message {
+                font-size: 13px;
+                padding: 10px;
+            }
+
+            .toggle-password {
+                right: 26px;
+                font-size: 16px;
             }
 
             .bg-1 {
-                width: 70px;
-                top: 35px;
-                left: 20px;
+                width: 90px;
+                top: 28px;
+                left: 16px;
             }
 
             .bg-2 {
-                width: 65px;
-                top: 60px;
-                right: 20px;
+                width: 82px;
+                top: 52px;
+                right: 18px;
             }
 
             .bg-3 {
-                width: 75px;
-                bottom: 140px;
-                left: 20px;
+                width: 90px;
+                bottom: 120px;
+                left: 18px;
             }
 
             .bg-4 {
-                width: 75px;
-                bottom: 150px;
+                width: 84px;
+                bottom: 128px;
+                right: 16px;
+            }
+
+            .bottom-wave {
+                height: 185px;
+                bottom: -18px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 16px 12px 85px;
+            }
+
+            .card {
+                width: 300px;
+                padding: 24px 18px;
+            }
+
+            .login-mascot {
+                width: 130px;
+                top: -55px;
+                right: -38px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 16px;
+            }
+
+            input,
+            button,
+            .password-wrapper input,
+            .flash-message {
+                width: 94%;
+            }
+
+            input {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 14px;
+                margin-top: 16px;
+            }
+
+            a {
+                font-size: 13px;
+                margin-top: 14px;
+            }
+
+            .flash-message {
+                font-size: 12.5px;
+                padding: 9px;
+                margin-bottom: 12px;
+            }
+
+            .toggle-password {
                 right: 20px;
+                font-size: 15px;
+            }
+
+            .bg-1 {
+                width: 58px;
+                top: 22px;
+                left: 10px;
+            }
+
+            .bg-2 {
+                width: 54px;
+                top: 38px;
+                right: 10px;
+            }
+
+            .bg-3 {
+                width: 58px;
+                bottom: 105px;
+                left: 10px;
+            }
+
+            .bg-4 {
+                width: 54px;
+                bottom: 110px;
+                right: 10px;
+            }
+
+            .bottom-wave {
+                height: 150px;
+                bottom: -14px;
             }
         }
     </style>
@@ -300,8 +482,6 @@
                 el: document.querySelector(".bg-1"),
                 t: 0,
                 step: 0.06,
-                baseX: 0,
-                baseY: 0,
                 ampX: 40,
                 ampY: 18,
                 rotAmp: 18,
@@ -311,8 +491,6 @@
                 el: document.querySelector(".bg-2"),
                 t: 1.2,
                 step: 0.05,
-                baseX: 0,
-                baseY: 0,
                 ampX: 32,
                 ampY: 24,
                 rotAmp: 15,
@@ -322,8 +500,6 @@
                 el: document.querySelector(".bg-3"),
                 t: 2.1,
                 step: 0.055,
-                baseX: 0,
-                baseY: 0,
                 ampX: 36,
                 ampY: 20,
                 rotAmp: 20,
@@ -333,8 +509,6 @@
                 el: document.querySelector(".bg-4"),
                 t: 0.7,
                 step: 0.045,
-                baseX: 0,
-                baseY: 0,
                 ampX: 28,
                 ampY: 26,
                 rotAmp: 16,

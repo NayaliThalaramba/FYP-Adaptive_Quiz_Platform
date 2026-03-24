@@ -8,7 +8,6 @@ def train_ppo():
     
     env = make_vec_env(lambda: QuizEnv(max_questions=20), n_envs=1)
 
-    # PPO model
     model = PPO(
         "MlpPolicy",
         env,
@@ -18,7 +17,6 @@ def train_ppo():
         batch_size=64,
     )
 
-    # train
     model.learn(total_timesteps=100000)
     model.save("ppo_quiz_final")
 

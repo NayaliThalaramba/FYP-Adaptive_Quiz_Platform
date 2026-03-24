@@ -91,7 +91,7 @@ def take_quiz():
     score = float(data['completion_rate'])
     time_spent = float(data['session_duration'])
 
-    # Fetch previous attempts from DB
+    # Fetching previous attempts from DB
     attempts = QuizAttempt.query.filter_by(
         user_id=current_user.id
     ).order_by(QuizAttempt.id).all()
@@ -316,7 +316,6 @@ def progress():
 
     progress_percent = min(attempts_count * 10, 100)
 
-    # -------- REAL DAILY STREAK --------
     attempt_dates = sorted(
         {a.created_at.date() for a in attempts},
         reverse=True
@@ -393,7 +392,7 @@ def admin_dashboard():
         engagement_trend=engagement_by_day  
     )
 
-# Routes
+
 @app.route('/')
 def welcome():
     return render_template('welcome.html')
