@@ -18,7 +18,7 @@
             justify-content: center;
             align-items: center;
             background: #F5F7F6;
-            overflow: hidden;
+            overflow-y: auto;
             position: relative;
             padding: 24px 20px 110px;
             box-sizing: border-box;
@@ -357,10 +357,14 @@
         {% endwith %}
 
         <form method="POST">
-            <input name="first_name" placeholder="First Name" required>
-            <input name="last_name" placeholder="Last Name" required>
-            <input name="email" type="email" placeholder="Email" required>
-            <input name="username" placeholder="Username" required>
+            <input name="first_name" placeholder="First Name" required
+                value="{{ form_data.first_name if form_data else '' }}">
+            <input name="last_name" placeholder="Last Name" required
+                value="{{ form_data.last_name if form_data else '' }}">
+            <input name="email" type="email" placeholder="Email" required
+                value="{{ form_data.email if form_data else '' }}">
+            <input name="username" placeholder="Username" required
+                value="{{ form_data.username if form_data else '' }}">
 
             <div class="password-wrapper">
                 <input id="registerPassword" name="password" type="password" placeholder="Password" required>

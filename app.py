@@ -174,44 +174,63 @@ def take_quiz():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    def render_register_with_data(clear_fields=None):
+        clear_fields = clear_fields or []
+
+        form_data = {
+            "first_name": request.form.get("first_name", "").strip(),
+            "last_name": request.form.get("last_name", "").strip(),
+            "email": request.form.get("email", "").strip().lower(),
+            "username": request.form.get("username", "").strip(),
+            "password": "",
+            "confirm_password": ""
+        }
+
+        for field in clear_fields:
+            if field in form_data:
+                form_data[field] = ""
+
+        return render_template('register.html', form_data=form_data)
+
     if request.method == 'POST':
         first_name = request.form['first_name'].strip()
         last_name = request.form['last_name'].strip()
         email = request.form['email'].strip().lower()
         username = request.form['username'].strip()
-        if any(char.isspace() for char in username):
-            flash("Username cannot contain spaces.", "error")
-            return render_template('register.html')
         password = request.form['password']
         confirm_password = request.form['confirm_password']
 
+        if any(char.isspace() for char in username):
+            flash("Username cannot contain spaces.", "error")
+            return render_register_with_data(clear_fields=["username"])
+
         if len(first_name) < 2:
             flash("First name must be at least 2 characters long.", "error")
-            return render_template('register.html')
+            return render_register_with_data(clear_fields=["first_name"])
 
         if len(last_name) < 2:
             flash("Last name must be at least 2 characters long.", "error")
-            return render_template('register.html')
+            return render_register_with_data(clear_fields=["last_name"])
 
         if len(username) < 4:
             flash("Username must be at least 4 characters long.", "error")
-            return render_template('register.html')
+            return render_register_with_data(clear_fields=["username"])
 
         if len(password) < 6:
             flash("Password must be at least 6 characters long.", "error")
-            return render_template('register.html')
+            return render_register_with_data(clear_fields=["password", "confirm_password"])
 
         if password != confirm_password:
             flash("Passwords do not match.", "error")
-            return render_template('register.html')
+            return render_register_with_data(clear_fields=["password", "confirm_password"])
 
         if User.query.filter_by(username=username).first():
             flash("Username already exists.", "error")
-            return render_template('register.html')
+            return render_register_with_data(clear_fields=["username"])
 
         if User.query.filter_by(email=email).first():
             flash("Email already registered.", "error")
-            return render_template('register.html')
+            return render_register_with_data(clear_fields=["email"])
 
         hashed_pw = generate_password_hash(password)
 
@@ -229,16 +248,17 @@ def register():
         flash("Registration successful. Please log in.", "success")
         return redirect(url_for('login'))
 
-    return render_template('register.html')
+    return render_template('register.html', form_data={})
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username'].strip()
+        password = request.form['password']
+
         if any(char.isspace() for char in username):
             flash("Username cannot contain spaces.", "error")
-            return render_template('login.html')
-        password = request.form['password']
+            return render_template('login.html', form_data={"username": ""})
 
         user = User.query.filter_by(username=username).first()
 
@@ -247,9 +267,9 @@ def login():
             return redirect(url_for('dashboard'))
 
         flash("Invalid credentials. Please try again.", "error")
-        return render_template('login.html')
+        return render_template('login.html', form_data={"username": username})
 
-    return render_template('login.html')
+    return render_template('login.html', form_data={})
 
 @app.route('/profile')
 @login_required

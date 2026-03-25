@@ -443,7 +443,8 @@
         {% endwith %}
 
         <form method="POST">
-            <input name="username" placeholder="Username" required>
+            <input name="username" placeholder="Username" required
+                value="{{ form_data.username if form_data else '' }}">
 
             <div class="password-wrapper">
                 <input id="loginPassword" name="password" type="password" placeholder="Password" required>
