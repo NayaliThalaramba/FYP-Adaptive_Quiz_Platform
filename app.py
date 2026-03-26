@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import joblib
+import shap
 import matplotlib
 matplotlib.use('Agg')
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
@@ -54,6 +55,10 @@ print("ppa_model =", ppa_model)
 print("Loading offline RandomForest model...")
 model = joblib.load("rf_model.pkl")
 print("RandomForest model loaded successfully.")
+
+print("Loading SHAP explainer...")
+explainer = shap.TreeExplainer(model)
+print("SHAP explainer loaded successfully.")
 
 reward_types = ['Points', 'Badge', 'Progress Bar', 'Leaderboard']
 
@@ -126,6 +131,50 @@ def take_quiz():
     ml_probs = model.predict_proba(features_df)[0]
     confidence = round(float(np.max(ml_probs)), 2)
 
+    ml_pred = model.predict(features_df)[0]
+    feature_names = features_df.columns.tolist()
+
+    try:
+        ml_class_pos = list(model.classes_).index(ml_pred)
+
+        shap_raw = explainer.shap_values(features_df)
+
+        if isinstance(shap_raw, list):
+            class_shap = shap_raw[ml_class_pos][0]
+        else:
+            shap_arr = np.array(shap_raw)
+
+            if shap_arr.ndim == 3:
+                if shap_arr.shape[0] == 1 and shap_arr.shape[2] == len(model.classes_):
+                    class_shap = shap_arr[0, :, ml_class_pos]
+                elif shap_arr.shape[0] == len(model.classes_):
+                    class_shap = shap_arr[ml_class_pos, 0, :]
+                else:
+                    class_shap = np.zeros(len(feature_names))
+            elif shap_arr.ndim == 2:
+                class_shap = shap_arr[0]
+            else:
+                class_shap = np.zeros(len(feature_names))
+
+        shap_explanation = {
+            feature_names[i]: round(float(class_shap[i]), 3)
+            for i in range(len(feature_names))
+        }
+
+        top_shap = dict(
+            sorted(
+                shap_explanation.items(),
+                key=lambda item: abs(item[1]),
+                reverse=True
+            )[:3]
+        )
+
+        print("SHAP TOP FEATURES:", top_shap)
+
+    except Exception as e:
+        print("SHAP explanation failed:", e)
+        top_shap = {}
+
     # PPO State
     obs = np.array([
         score,
@@ -152,6 +201,29 @@ def take_quiz():
     reward_name = reward_types[reward_idx]
     engagement_boost = round(score * 1.3, 2)
 
+    base_explanation = explain_reward(reward_name, score, confidence)
+
+    if top_shap:
+        shap_readable_names = {
+            "score": "quiz score",
+            "time_spent": "time spent",
+            "prev_engagement": "previous engagement",
+            "practice_accuracy": "practice accuracy",
+            "practice_frequency": "practice frequency",
+            "recency": "recency"
+        }
+
+        shap_parts = []
+        for feature, value in top_shap.items():
+            label = shap_readable_names.get(feature, feature.replace("_", " "))
+            direction = "increased" if value > 0 else "reduced"
+            shap_parts.append(f"{label} ({direction} influence: {abs(value):.3f})")
+
+        shap_text = "; ".join(shap_parts)
+        full_explanation = f"{base_explanation} Key factors influencing this reward were: {shap_text}."
+    else:
+        full_explanation = base_explanation
+
     new_attempt = QuizAttempt(
         score=score,
         time_spent=time_spent,
@@ -165,11 +237,12 @@ def take_quiz():
 
     return jsonify({
         'reward': reward_name,
-        'explanation': explain_reward(reward_name, score, confidence),
+        'explanation': full_explanation,
         'engagement_boost': engagement_boost,
         'static_score': score,
         'confidence': confidence,
-        'history_length': questions_seen + 1
+        'history_length': questions_seen + 1,
+        'shap': top_shap,
     })
 
 @app.route('/register', methods=['GET', 'POST'])
